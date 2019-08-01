@@ -2,6 +2,6 @@
 
 namespace glow {
 
-void foo();
+int foo();
 
 }
