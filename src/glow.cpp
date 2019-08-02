@@ -6,6 +6,8 @@
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
 
+#include <png.h>
+
 #include <cstdint>
 #include <exception>
 #include <iostream>
