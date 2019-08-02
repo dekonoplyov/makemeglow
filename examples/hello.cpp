@@ -4,6 +4,6 @@
 
 int main(int argc, char const* argv[])
 {
-    std::cout << "Hi" << glow::foo() << "\n";
+    glow::foo();
     return 0;
 }

@@ -12,17 +12,15 @@
 
 namespace glow {
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 100
+#define HEIGHT 100
 
 /* origin is the upper left corner */
-unsigned char image[HEIGHT][WIDTH];
+uint8_t image[HEIGHT * WIDTH];
 
 /* Replace this function with something useful. */
 
-void draw_bitmap(FT_Bitmap* bitmap,
-    FT_Int x,
-    FT_Int y)
+void draw_bitmap(FT_Bitmap* bitmap, FT_Int x, FT_Int y)
 {
     FT_Int i, j, p, q;
     FT_Int x_max = x + bitmap->width;
@@ -36,19 +34,8 @@ void draw_bitmap(FT_Bitmap* bitmap,
             if (i < 0 || j < 0 || i >= WIDTH || j >= HEIGHT)
                 continue;
 
-            image[j][i] |= bitmap->buffer[q * bitmap->width + p];
+            image[WIDTH * j + i] |= bitmap->buffer[q * bitmap->width + p];
         }
-    }
-}
-
-void show_image(void)
-{
-    for (int i = 0; i < HEIGHT; i++) {
-        for (int j = 0; j < WIDTH; j++)
-            putchar(image[i][j] == 0 ? ' '
-                                     : image[i][j] < 128 ? '+'
-                                                         : '*');
-        putchar('\n');
     }
 }
 
@@ -83,35 +70,18 @@ void some()
     initFTLibrary(&library);
     loadFont(&library, &face);
 
-    std::cout << face->units_per_EM << " " << face->num_glyphs << '\n';
-
     auto error = FT_Set_Char_Size(
         face, /* handle to face object           */
         0, /* char_width in 1/64th of points  */
-        16 * 64, /* char_height in 1/64th of points */
-        300, /* horizontal device resolution    */
-        300); /* vertical device resolution      */
-
-    // char charcode{'a'};
-    // auto glyph_index = FT_Get_Char_Index(face, charcode);
-
-    // const auto load_flags{FT_LOAD_DEFAULT};
-    // error = FT_Load_Glyph(
-    //     face, /* handle to face object */
-    //     glyph_index, /* glyph index           */
-    //     load_flags); /* load flags, see below */
-    // if (error != 0) {
-    //     throw std::runtime_error{"failed to load glyph"};
-    // }
+        40 * 64, /* char_height in 1/64th of points */
+        WIDTH, /* horizontal device resolution    */
+        HEIGHT); /* vertical device resolution      */
 
     FT_GlyphSlot slot = face->glyph; /* a small shortcut */
-    int pen_x = 300;
-    int pen_y = 200;
+    int pen_x = 50;
+    int pen_y = 15;
 
-    pen_x = 300;
-    pen_y = 200;
-
-    const std::string text{"abcd"};
+    const std::string text{"a"};
 
     for (const auto c : text) {
         FT_UInt glyph_index;
@@ -121,8 +91,9 @@ void some()
 
         /* load glyph image into the slot (erase previous one) */
         error = FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER);
-        if (error)
-            continue; /* ignore errors */
+        if (error != 0) {
+            throw std::runtime_error{"failed to load glyph"};
+        }
 
         /* now, draw to our target surface */
         draw_bitmap(&slot->bitmap,
@@ -134,17 +105,14 @@ void some()
         pen_y += slot->advance.y >> 6; /* not useful for now */
     }
 
-    show_image();
-
+    stbi_write_png("./some.png", WIDTH, HEIGHT, 3, &image, WIDTH);
     FT_Done_Face(face);
     FT_Done_FreeType(library);
 }
 
-int foo()
+void foo()
 {
     some();
-
-    return 42;
 }
 
 } // namespace glow
