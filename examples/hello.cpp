@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-int main(int argc, char const* argv[])
+int main()
 {
     glow::foo();
     return 0;
