@@ -50,15 +50,6 @@ public:
             PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
             PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
-        // Set title
-        // if (title != NULL) {
-        //     png_text title_text;
-        //     title_text.compression = PNG_TEXT_COMPRESSION_NONE;
-        //     title_text.key = "Title";
-        //     title_text.text = title;
-        //     png_set_text(png_ptr, info_ptr, &title_text, 1);
-        // }
-
         png_write_info(png_ptr_, info_ptr_);
 
         // Allocate memory for one row (4 bytes per pixel - RGBA)
