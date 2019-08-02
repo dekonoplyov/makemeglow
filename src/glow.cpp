@@ -1,10 +1,7 @@
 #include "makemeglow/glow.h"
 #include "makemeglow/color_buffer.h"
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
-
-#include <freetype2/ft2build.h>
+#include <ft2build.h>
 #include FT_FREETYPE_H
 
 #include <cstdint>
@@ -106,7 +103,6 @@ void some()
         pen_y += slot->advance.y >> 6; /* not useful for now */
     }
 
-    stbi_write_png("./some.png", WIDTH, HEIGHT, 3, &image, WIDTH);
     FT_Done_Face(face);
     FT_Done_FreeType(library);
 }
