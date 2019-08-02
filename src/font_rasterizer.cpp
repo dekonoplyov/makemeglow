@@ -1,5 +1,6 @@
 #include "font_rasterizer.h"
 
+#include <iostream>
 #include <stdexcept>
 
 namespace glow {
@@ -29,12 +30,16 @@ void loadFont(FT_Library* library, FT_Face* face)
     }
 }
 
-void drawBitamp(ColorBuffer* buffer, FT_Bitmap* bitmap, FT_Int xOffset)
+void drawBitamp(ColorBuffer* buffer, FT_Bitmap* bitmap, FT_Int x, FT_Int y, FT_Int xOffset)
 {
-    for (int y = 0; y < bitmap->rows; y++) {
-        for (int x = xOffset; x < xOffset + bitmap->width; x++) {
-            buffer->set(x, y,
-                Color{static_cast<uint8_t>(bitmap->buffer[y * bitmap->width + x])});
+    FT_Int i, j, p, q;
+    FT_Int x_max = x + bitmap->width;
+    FT_Int y_max = y + bitmap->rows;
+
+    for (j = y, q = 0; j < y_max; j++, q++ ) {
+        for (i = x, p = 0; i < x_max; i++, p++ ) {
+            buffer->set(p + xOffset, q,
+                Color{static_cast<uint8_t>(bitmap->buffer[q * bitmap->width + p])});
         }
     }
 }
@@ -64,11 +69,10 @@ ColorBuffer FontRasterizer::rasterize()
         throw std::runtime_error{"failed to load glyph"};
     }
 
-    const std::string text{"abcd"};
+    const std::string text{"abdcde fg.,<>(){}!@#$%^&*\"'{}}|\\/"};
     ColorBuffer buffer{
-        static_cast<size_t>(face_->max_advance_width) * text.size(),
-        static_cast<size_t>(face_->max_advance_height)};
-
+        20 * text.size(),
+        20};
 
     int xOffset = 0;
     for (const auto c : text) {
@@ -79,7 +83,7 @@ ColorBuffer FontRasterizer::rasterize()
         FT_GlyphSlot slot = face_->glyph;
 
         /* now, draw to our target surface */
-        drawBitamp(&buffer, &slot->bitmap, xOffset);
+        drawBitamp(&buffer, &slot->bitmap, slot->bitmap_left, slot->bitmap_top, xOffset);
 
         /* increment pen position */
         xOffset += slot->advance.x >> 6;
