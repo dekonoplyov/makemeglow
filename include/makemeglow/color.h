@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 
 namespace glow {
@@ -20,6 +22,14 @@ public:
         , g_{g}
         , b_{b}
         , a_{a}
+    {
+    }
+
+    Color(uint8_t c)
+        : r_{c}
+        , g_{c}
+        , b_{c}
+        , a_{c}
     {
     }
 

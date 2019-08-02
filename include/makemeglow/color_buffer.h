@@ -1,3 +1,5 @@
+#pragma once
+
 #include "color.h"
 
 #include <cstddef>
@@ -7,6 +9,14 @@
 
 namespace glow {
 
+/**
+ * Coordinates goes in these directions 
+ * (0, 0).−−> x
+ *       |...
+ *       |..(3, 2)
+ *       V
+ *       y
+ */
 class ColorBuffer {
 public:
     using Buffer = std::vector<Color>;
