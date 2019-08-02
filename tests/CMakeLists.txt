@@ -13,4 +13,4 @@ macro(package_add_test TESTNAME)
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-package_add_test(glowtest glow_test.cpp)
+package_add_test(glowtest glow_test.cpp color_test.cpp)
