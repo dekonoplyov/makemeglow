@@ -10,14 +10,14 @@ public:
         : r_{static_cast<uint8_t>((c >> 24) & 0xff)}
         , g_{static_cast<uint8_t>((c >> 16) & 0xff)}
         , b_{static_cast<uint8_t>((c >> 8) & 0xff)}
-        , a_{static_cast<uint8_t>(0xff)}
+        , a_{static_cast<uint8_t>(c & 0xff)}
     {
     }
 
     Color(uint8_t r,
         uint8_t g,
         uint8_t b,
-        uint8_t a)
+        uint8_t a = 255)
         : r_{r}
         , g_{g}
         , b_{b}
@@ -29,7 +29,7 @@ public:
         : r_{c}
         , g_{c}
         , b_{c}
-        , a_{c}
+        , a_{255}
     {
     }
 
