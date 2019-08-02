@@ -65,8 +65,8 @@ public:
         row_ = (png_bytep)malloc(4 * buffer_.width() * sizeof(png_byte));
 
         // Write image data
-        for (int y = 0; y < buffer_.height(); y++) {
-            for (int x = 0; x < buffer_.width(); x++) {
+        for (size_t y = 0; y < buffer_.height(); y++) {
+            for (size_t x = 0; x < buffer_.width(); x++) {
                 png_byte* currentPixel = &row_[x * 4];
                 const auto color = buffer_.at(x, y);
                 currentPixel[0] = color.r();
