@@ -1,12 +1,11 @@
 #include "makemeglow/glow.h"
+#include "makemeglow/color_buffer.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
-
-#include <png.h>
 
 #include <cstdint>
 #include <exception>
@@ -114,7 +113,18 @@ void some()
 
 void foo()
 {
-    some();
+    ColorBuffer buffer{100, 100};
+    for (int i = 10; i < 50; ++i) {
+        buffer.set(i, 10, Color{0xff, 0xff, 0, 0xff});
+        buffer.set(i, 11, Color{0xff, 0xff, 0, 0xff});
+    }
+
+    for (int i = 10; i < 50; ++i) {
+        buffer.set(i, 20, Color{0xff, 0, 0, 0xaa});
+        buffer.set(i, 21, Color{0xff, 0, 0, 0xaa});
+    }
+
+    writePng("./some.png", buffer);
 }
 
 } // namespace glow

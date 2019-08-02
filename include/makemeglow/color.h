@@ -5,10 +5,10 @@ namespace glow {
 class Color {
 public:
     Color(uint32_t c = 0)
-        : r_{(c >> 24) & 0xff}
-        , g_{(c >> 16) & 0xff}
-        , b_{(c >> 8) & 0xff}
-        , a_{0xff}
+        : r_{static_cast<uint8_t>((c >> 24) & 0xff)}
+        , g_{static_cast<uint8_t>((c >> 16) & 0xff)}
+        , b_{static_cast<uint8_t>((c >> 8) & 0xff)}
+        , a_{static_cast<uint8_t>(0xff)}
     {
     }
 

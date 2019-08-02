@@ -1,6 +1,6 @@
 add_library(makemeglow STATIC
     glow.cpp
-    png.cpp)
+    color_buffer.cpp)
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
