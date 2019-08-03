@@ -50,6 +50,9 @@ public:
         return a_;
     }
 
+    Color operator*(float m);
+    Color operator+(Color c);
+
 private:
     uint8_t r_;
     uint8_t g_;

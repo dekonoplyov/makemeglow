@@ -1,11 +1,9 @@
 #pragma once
 
 #include "makemeglow/color_buffer.h"
-#include "makemeglow/color_buffer.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-
 
 namespace glow {
 
@@ -15,10 +13,7 @@ public:
 
     ~FontRasterizer();
 
-    ColorBuffer rasterize();
-
-private:
-    ColorBuffer createPropperSizeBuffer(const std::string& text);
+    ColorBuffer rasterize(size_t pixelSize);
 
 private:
     FT_Library library_;

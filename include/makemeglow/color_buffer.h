@@ -60,6 +60,11 @@ public:
         return buffer_.at(x + y * width_);
     }
 
+    Color& at(size_t x, size_t y)
+    {
+        return buffer_.at(x + y * width_);
+    }
+
     void set(size_t x, size_t y, Color c)
     {
         buffer_.at(x + y * width_) = c;

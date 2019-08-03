@@ -1,5 +1,6 @@
 add_library(makemeglow STATIC
     glow.cpp
+    color.cpp
     color_buffer.cpp
     font_rasterizer.cpp)
 target_include_directories(${PROJECT_NAME}
