@@ -26,10 +26,7 @@ public:
     }
 
     Color(uint8_t c)
-        : r_{c}
-        , g_{c}
-        , b_{c}
-        , a_{255}
+        : Color{c, c, c}
     {
     }
 

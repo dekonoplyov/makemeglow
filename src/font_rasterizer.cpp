@@ -41,8 +41,10 @@ void drawBitamp(ColorBuffer* buffer, size_t left, size_t top, FT_Bitmap* bitmap)
 {
     for (size_t y = 0; y < bitmap->rows; ++y) {
         for (size_t x = 0; x < bitmap->width; ++x) {
+            // TODO check better way to remove black borders
+            const auto intensity = static_cast<uint8_t>(bitmap->buffer[y * bitmap->width + x]);
             buffer->set(left + x, top + y,
-                Color{static_cast<uint8_t>(bitmap->buffer[y * bitmap->width + x])});
+                Color{intensity, intensity, intensity, intensity});
         }
     }
 }
