@@ -18,6 +18,9 @@ public:
     ColorBuffer rasterize();
 
 private:
+    ColorBuffer createPropperSizeBuffer(const std::string& text);
+
+private:
     FT_Library library_;
     FT_Face face_;
 };

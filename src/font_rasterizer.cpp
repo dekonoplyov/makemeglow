@@ -30,16 +30,19 @@ void loadFont(FT_Library* library, FT_Face* face)
     }
 }
 
-void drawBitamp(ColorBuffer* buffer, FT_Bitmap* bitmap, FT_Int x, FT_Int y, FT_Int xOffset)
+void loadGlyph(FT_Face* face, char c)
 {
-    FT_Int i, j, p, q;
-    FT_Int x_max = x + bitmap->width;
-    FT_Int y_max = y + bitmap->rows;
+    if (FT_Load_Char(*face, c, FT_LOAD_RENDER) != 0) {
+        throw std::runtime_error{"failed to load glyph"};
+    }
+}
 
-    for (j = y, q = 0; j < y_max; j++, q++ ) {
-        for (i = x, p = 0; i < x_max; i++, p++ ) {
-            buffer->set(p + xOffset, q,
-                Color{static_cast<uint8_t>(bitmap->buffer[q * bitmap->width + p])});
+void drawBitamp(ColorBuffer* buffer, size_t left, size_t top, FT_Bitmap* bitmap)
+{
+    for (size_t y = 0; y < bitmap->rows; ++y) {
+        for (size_t x = 0; x < bitmap->width; ++x) {
+            buffer->set(left + x, top + y,
+                Color{static_cast<uint8_t>(bitmap->buffer[y * bitmap->width + x])});
         }
     }
 }
@@ -63,30 +66,48 @@ FontRasterizer::~FontRasterizer()
     FT_Done_FreeType(library_);
 }
 
+ColorBuffer FontRasterizer::createPropperSizeBuffer(const std::string& text)
+{
+    // TODO cleanup converions + refactor
+    FT_Pos width = 0;
+    int max_height = 0;
+    for (const auto c : text) {
+        loadGlyph(&face_, c);
+        width += face_->glyph->advance.x >> 6;
+    
+        FT_Bitmap* bitmap = &(face_->glyph->bitmap);
+        int top = (face_->ascender >> 6) - face_->glyph->bitmap_top;
+        if (top < 0)
+            top = 0;
+        max_height = std::max(max_height, static_cast<int>(top + bitmap->rows));
+    }
+
+    return ColorBuffer{static_cast<size_t>(width), static_cast<size_t>(max_height)};
+}
+
 ColorBuffer FontRasterizer::rasterize()
 {
-    if (FT_Set_Pixel_Sizes(face_, 0, 20) != 0) {
-        throw std::runtime_error{"failed to load glyph"};
+    const size_t pixelSize = 40;
+    if (FT_Set_Pixel_Sizes(face_, 0, pixelSize) != 0) {
+        throw std::runtime_error{"failed to set pixel sizes glyph"};
     }
 
     const std::string text{"abdcde fg.,<>(){}!@#$%^&*\"'{}}|\\/"};
-    ColorBuffer buffer{
-        20 * text.size(),
-        20};
+    auto buffer = createPropperSizeBuffer(text);
 
-    int xOffset = 0;
+    size_t left = 0;
     for (const auto c : text) {
-        if (FT_Load_Char(face_, c, FT_LOAD_RENDER) != 0) {
-            throw std::runtime_error{"failed to load glyph"};
-        }
+        loadGlyph(&face_, c);
 
         FT_GlyphSlot slot = face_->glyph;
 
-        /* now, draw to our target surface */
-        drawBitamp(&buffer, &slot->bitmap, slot->bitmap_left, slot->bitmap_top, xOffset);
+        int top = (face_->ascender >> 6) - face_->glyph->bitmap_top;
+        if (top < 0) {
+            top = 0;
+        }
+        drawBitamp(&buffer, left, top, &slot->bitmap);
 
-        /* increment pen position */
-        xOffset += slot->advance.x >> 6;
+        left += slot->advance.x >> 6;
     }
 
     return buffer;
