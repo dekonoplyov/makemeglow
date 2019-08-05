@@ -38,6 +38,17 @@ void loadGlyph(FT_Face face, char c)
     }
 }
 
+FT_Pos getKerning(FT_Face face, FT_UInt previous, FT_UInt glyphIndex)
+{
+    FT_Vector delta;
+
+    if (FT_Get_Kerning(face, previous, glyphIndex, FT_KERNING_DEFAULT, &delta) != 0) {
+        throw std::runtime_error{"failed to get kerning"};
+    }
+
+    return delta.x >> 6;
+}
+
 struct RasterizerInfo {
     size_t bufferWidth;
     size_t bufferHeight;
@@ -56,11 +67,19 @@ RasterizerInfo getInfo(FT_Face face, const std::string& text)
     // TODO check if it could be reduced
     int lastCharXTail = 0;
 
+    const FT_Bool useKerning = FT_HAS_KERNING(face);
+    FT_UInt previous = 0;
+
     for (const auto c : text) {
         loadGlyph(face, c);
         auto slot = face->glyph;
 
-        FT_Pos tail = static_cast<int>(slot->bitmap.rows) - slot->bitmap_top;
+        const auto glyphIndex = FT_Get_Char_Index(face, c);
+        if (useKerning && previous != 0 && glyphIndex != 0) {
+            width += getKerning(face, previous, glyphIndex);
+        }
+
+        const FT_Pos tail = static_cast<int>(slot->bitmap.rows) - slot->bitmap_top;
 
         const auto advance = slot->advance.x >> 6;
         width += advance;
@@ -68,6 +87,8 @@ RasterizerInfo getInfo(FT_Face face, const std::string& text)
 
         maxTail = std::max(maxTail, tail);
         maxBearingY = std::max(maxBearingY, slot->bitmap_top);
+
+        previous = glyphIndex;
     }
 
     if (lastCharXTail < 0) {
@@ -115,14 +136,24 @@ IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelS
         throw std::runtime_error{"failed to set pixel sizes glyph"};
     }
 
+    const FT_Bool hasKerning = FT_HAS_KERNING(face_);
+    FT_UInt previous = 0;
+
     const auto rasterInfo = getInfo(face_, text);
     IntensityBuffer buffer{rasterInfo.bufferWidth, rasterInfo.bufferHeight};
 
     size_t left = 0;
     for (const auto c : text) {
+
+        const auto glyph_index = FT_Get_Char_Index(face_, c);
+        if (hasKerning && previous != 0 && glyph_index != 0) {
+            // firs kernig never should be less than zero
+            left += getKerning(face_, previous, glyph_index);
+        }
+
         loadGlyph(face_, c);
 
-        FT_GlyphSlot slot = face_->glyph;
+        const auto slot = face_->glyph;
 
         int top = rasterInfo.maxBearingY - face_->glyph->bitmap_top;
         if (top < 0) {
@@ -131,6 +162,8 @@ IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelS
         drawBitamp(&buffer, left, top, &slot->bitmap);
 
         left += slot->advance.x >> 6;
+
+        previous = glyph_index;
     }
 
     return buffer;

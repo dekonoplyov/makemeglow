@@ -36,10 +36,15 @@ ColorBuffer glowText(IntensityBuffer buffer)
             uint8_t intensity = static_cast<uint8_t>(std::clamp(intensityAcc * multiplier, 0.f, 255.f));
             if (x > margin && x < (buffer.width() + margin)
                 && y > margin && y < (buffer.height() + margin)) {
-                    intensity = std::max(intensity, buffer.at(x - margin, y - margin));
+                intensity = std::max(intensity, buffer.at(x - margin, y - margin));
             }
 
-            Color c{231, 89, 163, intensity};
+            Color c{
+                static_cast<uint8_t>(231 * (intensity / 255.f)),
+                static_cast<uint8_t>(89 * (intensity / 255.f)),
+                static_cast<uint8_t>(163 * (intensity / 255.f)),
+                255};
+
             glowedBuffer.at(x, y) = c;
         }
     }
@@ -49,7 +54,7 @@ ColorBuffer glowText(IntensityBuffer buffer)
 
 void some(FontRasterizer& rr, size_t px)
 {
-    const std::string s = "./data/logo" + std::to_string(px) + "px.png";
+    const std::string s = "./junk/" + std::to_string(px) + "px.png";
     const std::string text{"makemeglow"};
     writePng(s, glowText(rr.rasterize(text, px)));
 }
@@ -57,17 +62,16 @@ void some(FontRasterizer& rr, size_t px)
 void foo()
 {
     FontRasterizer rr{"/usr/share/fonts/truetype/ubuntu/Ubuntu-C.ttf"};
-    // some(rr, 10);
-    // some(rr, 15);
-    // some(rr, 20);
-    // some(rr, 25);
-    // some(rr, 30);
-    // some(rr, 40);
-    // some(rr, 50);
-    // some(rr, 80);
-    // some(rr, 100);
-    // some(rr, 150);
-    some(rr, 200);
+    some(rr, 10);
+    some(rr, 15);
+    some(rr, 20);
+    some(rr, 25);
+    some(rr, 30);
+    some(rr, 40);
+    some(rr, 50);
+    some(rr, 80);
+    some(rr, 100);
+    some(rr, 150);
 }
 
 } // namespace glow
