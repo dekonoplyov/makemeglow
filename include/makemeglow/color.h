@@ -6,6 +6,7 @@ namespace glow {
 
 class Color {
 public:
+    // works correct only on little-endian architectures
     Color(uint32_t c = 0)
         : r_{static_cast<uint8_t>((c >> 24) & 0xff)}
         , g_{static_cast<uint8_t>((c >> 16) & 0xff)}
