@@ -41,11 +41,7 @@ void loadGlyph(FT_Face face, char c)
 FT_Pos getKerning(FT_Face face, FT_UInt previous, FT_UInt glyphIndex)
 {
     FT_Vector delta;
-
-    if (FT_Get_Kerning(face, previous, glyphIndex, FT_KERNING_DEFAULT, &delta) != 0) {
-        throw std::runtime_error{"failed to get kerning"};
-    }
-
+    FT_Get_Kerning(face, previous, glyphIndex, FT_KERNING_DEFAULT, &delta);
     return delta.x >> 6;
 }
 
