@@ -1,5 +1,6 @@
 #include "font_rasterizer.h"
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 
@@ -52,34 +53,39 @@ RasterizerInfo getInfo(FT_Face face, const std::string& text)
     int maxBearingY = 0;
     FT_Pos maxTail = 0;
 
+    // TODO check if it could be reduced
+    int lastCharXTail = 0;
+
     for (const auto c : text) {
         loadGlyph(face, c);
         auto slot = face->glyph;
 
         FT_Pos tail = static_cast<int>(slot->bitmap.rows) - slot->bitmap_top;
 
-        width += slot->advance.x >> 6;
+        const auto advance = slot->advance.x >> 6;
+        width += advance;
+        lastCharXTail = slot->bitmap.rows - advance;
+
         maxTail = std::max(maxTail, tail);
         maxBearingY = std::max(maxBearingY, slot->bitmap_top);
     }
 
-    return {static_cast<size_t>(width),
+    if (lastCharXTail < 0) {
+        lastCharXTail = 0;
+    }
+
+    return {static_cast<size_t>(width + lastCharXTail),
         static_cast<size_t>(maxBearingY + maxTail),
         static_cast<size_t>(maxBearingY)};
 }
 
-void drawBitamp(ColorBuffer* buffer, size_t left, size_t top, FT_Bitmap* bitmap)
+void drawBitamp(IntensityBuffer* buffer, size_t left, size_t top, FT_Bitmap* bitmap)
 {
     for (size_t y = 0; y < bitmap->rows; ++y) {
         for (size_t x = 0; x < bitmap->width; ++x) {
-            // TODO check better way to remove black borders
-            // TODO make pretty or operator
-            const auto intensity = std::max(
-                buffer->at(left + x, top + y).r(),
+            buffer->at(left + x, top + y) = std::max(
+                buffer->at(left + x, top + y),
                 static_cast<uint8_t>(bitmap->buffer[y * bitmap->width + x]));
-
-            buffer->set(left + x, top + y,
-                Color{intensity, intensity, intensity, intensity});
         }
     }
 }
@@ -103,15 +109,14 @@ FontRasterizer::~FontRasterizer()
     FT_Done_FreeType(library_);
 }
 
-ColorBuffer FontRasterizer::rasterize(size_t pixelSize)
+IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelSize)
 {
     if (FT_Set_Pixel_Sizes(face_, 0, pixelSize) != 0) {
         throw std::runtime_error{"failed to set pixel sizes glyph"};
     }
 
-    const std::string text{"abdcde fg.,<>(){}!@#$%^&*\"'{}}|\\/A"};
     const auto rasterInfo = getInfo(face_, text);
-    ColorBuffer buffer{rasterInfo.bufferWidth, rasterInfo.bufferHeight};
+    IntensityBuffer buffer{rasterInfo.bufferWidth, rasterInfo.bufferHeight};
 
     size_t left = 0;
     for (const auto c : text) {

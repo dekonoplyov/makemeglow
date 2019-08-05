@@ -17,30 +17,22 @@ namespace glow {
  *       V
  *       y
  */
-class ColorBuffer {
+template <typename T>
+class Buffer {
 public:
-    using Buffer = std::vector<Color>;
-
-    ColorBuffer(size_t width, size_t height)
+    Buffer(size_t width, size_t height)
         : width_{width}
         , height_{height}
-        , buffer_{Buffer(width_ * height_)}
+        , buffer_{std::vector<T>(width_ * height_)}
     {
     }
 
-    ColorBuffer(size_t width, size_t height, Buffer buffer)
-        : width_{width}
-        , height_{height}
-        , buffer_{std::move(buffer)}
-    {
-    }
-
-    const std::vector<Color>& buffer() const
+    const std::vector<T>& data() const
     {
         return buffer_;
     }
 
-    std::vector<Color>& buffer()
+    std::vector<T>& data()
     {
         return buffer_;
     }
@@ -55,26 +47,24 @@ public:
         return height_;
     }
 
-    Color at(size_t x, size_t y) const
+    T at(size_t x, size_t y) const
     {
         return buffer_.at(x + y * width_);
     }
 
-    Color& at(size_t x, size_t y)
+    T& at(size_t x, size_t y)
     {
         return buffer_.at(x + y * width_);
-    }
-
-    void set(size_t x, size_t y, Color c)
-    {
-        buffer_.at(x + y * width_) = c;
     }
 
 private:
     size_t width_;
     size_t height_;
-    std::vector<Color> buffer_;
+    std::vector<T> buffer_;
 };
+
+using IntensityBuffer = Buffer<uint8_t>;
+using ColorBuffer = Buffer<Color>;
 
 void writePng(const std::string& filename, const ColorBuffer& buffer);
 
