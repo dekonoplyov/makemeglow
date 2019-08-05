@@ -15,10 +15,10 @@ void initFTLibrary(FT_Library* library)
     }
 }
 
-void loadFont(FT_Library* library, FT_Face* face)
+void loadFont(FT_Library* library, FT_Face* face, const std::string& font)
 {
     const auto error = FT_New_Face(*library,
-        "/usr/share/fonts/truetype/ubuntu/Ubuntu-C.ttf",
+        font.c_str(),
         /*face_index*/ 0,
         face);
     if (error == FT_Err_Unknown_File_Format) {
@@ -91,10 +91,10 @@ struct FontRasterizerOptions {
     size_t size;
 };
 
-FontRasterizer::FontRasterizer()
+FontRasterizer::FontRasterizer(const std::string& font)
 {
     initFTLibrary(&library_);
-    loadFont(&library_, &face_);
+    loadFont(&library_, &face_, font);
 }
 
 FontRasterizer::~FontRasterizer()

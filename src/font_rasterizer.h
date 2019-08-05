@@ -7,9 +7,10 @@
 
 namespace glow {
 
+// TODO make nice api
 class FontRasterizer {
 public:
-    FontRasterizer();
+    FontRasterizer(const std::string& font);
 
     ~FontRasterizer();
 
