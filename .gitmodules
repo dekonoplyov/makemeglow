@@ -2,3 +2,6 @@
 	path = extern/googletest
 	url = https://github.com/google/googletest
 	branch = v1.8.x
+[submodule "extern/cxxopts"]
+	path = extern/cxxopts
+	url = https://github.com/jarro2783/cxxopts
