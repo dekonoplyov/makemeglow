@@ -51,14 +51,15 @@ public:
         return a_;
     }
 
-    Color operator*(float m);
-    Color operator+(Color c);
-
 private:
     uint8_t r_;
     uint8_t g_;
     uint8_t b_;
     uint8_t a_;
 };
+
+float clampChannel(float f);
+
+Color blendColors(Color bg, Color fg);
 
 } // namespace glow

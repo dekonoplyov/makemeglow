@@ -37,7 +37,7 @@ ColorBuffer gaussianBlur(
                     res += static_cast<float>(buffer.at(x - i, y)) * weights[i];
                 }
             }
-            horizontalPass.at(x, y) = static_cast<uint8_t>(std::clamp(res, 0.f, 255.f));
+            horizontalPass.at(x, y) = static_cast<uint8_t>(clampChannel(res));
         }
     }
 
@@ -54,12 +54,9 @@ ColorBuffer gaussianBlur(
                 }
             }
 
-            const auto intensity = std::max(static_cast<uint8_t>(std::clamp(res, 0.f, 255.f)), buffer.at(x, y)) / 255.f;
-            verticalPass.at(x, y) = Color{
-                static_cast<uint8_t>(textColor.r() * intensity),
-                static_cast<uint8_t>(textColor.g() * intensity),
-                static_cast<uint8_t>(textColor.b() * intensity),
-                255};
+            const auto intensity = std::max(static_cast<uint8_t>(clampChannel(res)), buffer.at(x, y)) / 255.f;
+            Color c{textColor.r(), textColor.g(), textColor.b(), static_cast<uint8_t>(textColor.a() * intensity)};
+            verticalPass.at(x, y) = blendColors(backgroundColor, c);
         }
     }
 

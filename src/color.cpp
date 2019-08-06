@@ -1,44 +1,33 @@
 #include "makemeglow/color.h"
 
 #include <algorithm>
+#include <array>
 #include <limits>
 
 namespace glow {
 
 namespace {
 
-uint8_t clampedSum(uint8_t a, uint8_t b)
-{
-    return std::clamp(a + b,
-        static_cast<int>(std::numeric_limits<uint8_t>::min()),
-        static_cast<int>(std::numeric_limits<uint8_t>::max()));
-}
-
-uint8_t clampedMultiply(uint8_t a, float m)
-{
-    return std::clamp(a * m,
-        static_cast<float>(std::numeric_limits<uint8_t>::min()),
-        static_cast<float>(std::numeric_limits<uint8_t>::max()));
-}
+constexpr float FLOAT_COLOR_CHANNEL_MIN = 0.f;
+constexpr float FLOAT_COLOR_CHANNEL_MAX = 255.f;
 
 } // namespace
 
-Color Color::operator*(float m)
+float clampChannel(float f)
 {
-    return Color{
-        clampedMultiply(r_, m),
-        clampedMultiply(g_, m),
-        clampedMultiply(b_, m),
-        clampedMultiply(a_, m)};
+    return std::clamp(f, FLOAT_COLOR_CHANNEL_MIN, FLOAT_COLOR_CHANNEL_MAX);
 }
 
-Color Color::operator+(Color c)
+Color blendColors(Color bg, Color fg)
 {
-    return Color{
-        clampedSum(r_, c.r()),
-        clampedSum(g_, c.g()),
-        clampedSum(b_, c.g()),
-        clampedSum(a_, c.a())};
+    const uint32_t alpha = fg.a();
+    const uint32_t invAlpha = 255 - alpha;
+    return {
+        static_cast<uint8_t>((alpha * fg.r() + invAlpha * bg.r()) >> 8),
+        static_cast<uint8_t>((alpha * fg.g() + invAlpha * bg.g()) >> 8),
+        static_cast<uint8_t>((alpha * fg.b() + invAlpha * bg.b()) >> 8),
+        0xff
+    };
 }
 
 } // namespace glow
