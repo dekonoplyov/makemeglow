@@ -1,6 +1,7 @@
 #include "gauss.h"
 
-#include <math.h>
+#include <cmath>
+#include <iostream>
 
 namespace glow {
 
@@ -16,15 +17,20 @@ std::vector<float> createGauss1dKernel(size_t radius, float sigma)
 
     std::vector<float> weights(radius);
 
-    float s = 2.0 * sigma * sigma;
-    for (int i = 0; i < radius; ++i) {
-        // float r = 
-        // weights[i] = (std::exp(-(r * r) / s)) / (M_PI * s);
+    const float sigma2 = 2.f * sigma * sigma;
+    float sum = 0.f;
+    for (size_t i = 0; i < radius; ++i) {
+        weights[i] = std::exp(-static_cast<float>(i * i) / sigma2);
+        sum += 2.f * weights[i];
     }
 
-    // TODO make real compute
+    sum -= weights[0];
 
-    return {0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.016216f};
+    for (size_t i = 0; i < radius; ++i) {
+        weights[i] /= sum;
+    }
+
+    return weights;
 }
 
 } // namespace glow
