@@ -126,7 +126,7 @@ FontRasterizer::~FontRasterizer()
     FT_Done_FreeType(library_);
 }
 
-IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelSize)
+IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelSize, size_t margin)
 {
     if (FT_Set_Pixel_Sizes(face_, 0, pixelSize) != 0) {
         throw std::runtime_error{"failed to set pixel sizes glyph"};
@@ -136,14 +136,16 @@ IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelS
     FT_UInt previous = 0;
 
     const auto rasterInfo = getInfo(face_, text);
-    IntensityBuffer buffer{rasterInfo.bufferWidth, rasterInfo.bufferHeight};
+    IntensityBuffer buffer{
+        rasterInfo.bufferWidth + 2 * margin,
+        rasterInfo.bufferHeight + 2 * margin};
 
-    size_t left = 0;
+    size_t left = margin;
     for (const auto c : text) {
 
         const auto glyph_index = FT_Get_Char_Index(face_, c);
         if (hasKerning && previous != 0 && glyph_index != 0) {
-            // firs kernig never should be less than zero
+            // first kernig never should be less than zero
             left += getKerning(face_, previous, glyph_index);
         }
 
@@ -155,6 +157,7 @@ IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelS
         if (top < 0) {
             top = 0;
         }
+        top += margin;
         drawBitamp(&buffer, left, top, &slot->bitmap);
 
         left += slot->advance.x >> 6;

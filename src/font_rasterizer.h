@@ -14,7 +14,7 @@ public:
 
     ~FontRasterizer();
 
-    IntensityBuffer rasterize(const std::string& text, size_t pixelSize);
+    IntensityBuffer rasterize(const std::string& text, size_t pixelSize, size_t margin = 0);
 
 private:
     FT_Library library_;
