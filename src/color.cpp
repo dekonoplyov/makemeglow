@@ -20,6 +20,7 @@ float clampChannel(float f)
 
 Color blendColors(Color bg, Color fg)
 {
+    // TODO fix alpha blending
     const uint32_t alpha = fg.a();
     const uint32_t invAlpha = 255 - alpha;
     return {

@@ -18,9 +18,6 @@ ColorBuffer gaussianBlur(
     Color textColor,
     Color backgroundColor)
 {
-    // TODO apply backgroundColor
-    // TODO make real color blending
-
     const int yLimit = static_cast<int>(buffer.height());
     const int xLimit = static_cast<int>(buffer.width());
     const int radius = static_cast<int>(weights.size());
