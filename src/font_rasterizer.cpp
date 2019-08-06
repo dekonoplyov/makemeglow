@@ -48,52 +48,50 @@ FT_Pos getKerning(FT_Face face, FT_UInt previous, FT_UInt glyphIndex)
 struct RasterizerInfo {
     size_t bufferWidth;
     size_t bufferHeight;
-    size_t maxBearingY;
+    FT_Int maxBearingY;
 };
 
 RasterizerInfo getInfo(FT_Face face, const std::string& text)
 {
-    // TODO refactor types and conversions
-    // compute max from baseline -- max of all tops
-    // compute max tail -- max of diffs rows and tops
+    // Compute wrapping buffer size
+    // lastCharXTail = width - advance
+    // width = sum(advance.x + kerning) + lastCharXTail
+    // height = maxBearingY + maxTailY
+    // Also remember maxBearingY it's our baseline
     FT_Pos width = 0;
-    int maxBearingY = 0;
-    FT_Pos maxTail = 0;
-
-    // TODO check if it could be reduced
-    int lastCharXTail = 0;
+    FT_Int maxBearingY = 0;
+    FT_Int maxTailY = 0;
+    FT_Int lastCharTailX = 0;
 
     const FT_Bool useKerning = FT_HAS_KERNING(face);
-    FT_UInt previous = 0;
+    FT_UInt previousGlyphIndex = 0;
 
     for (const auto c : text) {
         loadGlyph(face, c);
         auto slot = face->glyph;
 
+        // width
         const auto glyphIndex = FT_Get_Char_Index(face, c);
-        if (useKerning && previous != 0 && glyphIndex != 0) {
-            width += getKerning(face, previous, glyphIndex);
+        if (useKerning && previousGlyphIndex != 0 && glyphIndex != 0) {
+            width += getKerning(face, previousGlyphIndex, glyphIndex);
         }
-
-        const FT_Pos tail = static_cast<int>(slot->bitmap.rows) - slot->bitmap_top;
-
         const auto advance = slot->advance.x >> 6;
         width += advance;
-        lastCharXTail = slot->bitmap.rows - advance;
+        lastCharTailX = static_cast<FT_Int>(slot->bitmap.width) - advance;
 
-        maxTail = std::max(maxTail, tail);
         maxBearingY = std::max(maxBearingY, slot->bitmap_top);
 
-        previous = glyphIndex;
+        const FT_Int tailY = static_cast<FT_Int>(slot->bitmap.rows) - slot->bitmap_top;
+        maxTailY = std::max(maxTailY, tailY);
+
+        // update glyphIndex for kerning
+        previousGlyphIndex = glyphIndex;
     }
 
-    if (lastCharXTail < 0) {
-        lastCharXTail = 0;
-    }
-
-    return {static_cast<size_t>(width + lastCharXTail),
-        static_cast<size_t>(maxBearingY + maxTail),
-        static_cast<size_t>(maxBearingY)};
+    return {
+        static_cast<size_t>(width + lastCharTailX),
+        static_cast<size_t>(maxBearingY + maxTailY),
+        maxBearingY};
 }
 
 void drawBitamp(IntensityBuffer* buffer, size_t left, size_t top, FT_Bitmap* bitmap)
@@ -132,37 +130,35 @@ IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelS
         throw std::runtime_error{"failed to set pixel sizes glyph"};
     }
 
-    const FT_Bool hasKerning = FT_HAS_KERNING(face_);
-    FT_UInt previous = 0;
-
     const auto rasterInfo = getInfo(face_, text);
     IntensityBuffer buffer{
         rasterInfo.bufferWidth + 2 * margin,
         rasterInfo.bufferHeight + 2 * margin};
 
-    size_t left = margin;
-    for (const auto c : text) {
+    FT_Pos left = margin;
 
-        const auto glyph_index = FT_Get_Char_Index(face_, c);
-        if (hasKerning && previous != 0 && glyph_index != 0) {
-            // first kernig never should be less than zero
-            left += getKerning(face_, previous, glyph_index);
+    const FT_Bool hasKerning = FT_HAS_KERNING(face_);
+    FT_UInt previousGlyphIndex = 0;
+
+    for (const auto c : text) {
+        const auto glyphIndex = FT_Get_Char_Index(face_, c);
+        if (hasKerning && previousGlyphIndex != 0 && glyphIndex != 0) {
+            left += getKerning(face_, previousGlyphIndex, glyphIndex);
         }
 
         loadGlyph(face_, c);
-
         const auto slot = face_->glyph;
 
-        int top = rasterInfo.maxBearingY - face_->glyph->bitmap_top;
-        if (top < 0) {
-            top = 0;
+        FT_Int top = margin + rasterInfo.maxBearingY - face_->glyph->bitmap_top;
+        if (top < margin) {
+            top = margin;
         }
-        top += margin;
-        drawBitamp(&buffer, left, top, &slot->bitmap);
+        drawBitamp(&buffer, static_cast<size_t>(left), static_cast<size_t>(top), &slot->bitmap);
 
         left += slot->advance.x >> 6;
 
-        previous = glyph_index;
+        // update glyphIndex for kerning
+        previousGlyphIndex = glyphIndex;
     }
 
     return buffer;
