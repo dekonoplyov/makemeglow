@@ -45,6 +45,7 @@ FT_Pos getKerning(FT_Face face, FT_UInt previous, FT_UInt glyphIndex)
     return delta.x >> 6;
 }
 
+// TODO make meaningfull naming
 struct RasterizerInfo {
     size_t bufferWidth;
     size_t bufferHeight;
@@ -70,7 +71,6 @@ RasterizerInfo getInfo(FT_Face face, const std::string& text)
         loadGlyph(face, c);
         auto slot = face->glyph;
 
-        // width
         const auto glyphIndex = FT_Get_Char_Index(face, c);
         if (useKerning && previousGlyphIndex != 0 && glyphIndex != 0) {
             width += getKerning(face, previousGlyphIndex, glyphIndex);
@@ -81,7 +81,7 @@ RasterizerInfo getInfo(FT_Face face, const std::string& text)
 
         maxBearingY = std::max(maxBearingY, slot->bitmap_top);
 
-        const FT_Int tailY = static_cast<FT_Int>(slot->bitmap.rows) - slot->bitmap_top;
+        const auto tailY = static_cast<FT_Int>(slot->bitmap.rows) - slot->bitmap_top;
         maxTailY = std::max(maxTailY, tailY);
 
         // update glyphIndex for kerning
@@ -107,11 +107,6 @@ void drawBitamp(IntensityBuffer* buffer, size_t left, size_t top, FT_Bitmap* bit
 
 } // namespace
 
-struct FontRasterizerOptions {
-    std::string font;
-    size_t size;
-};
-
 FontRasterizer::FontRasterizer(const std::string& font)
 {
     initFTLibrary(&library_);
@@ -127,7 +122,7 @@ FontRasterizer::~FontRasterizer()
 IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelSize, size_t margin)
 {
     if (FT_Set_Pixel_Sizes(face_, 0, pixelSize) != 0) {
-        throw std::runtime_error{"failed to set pixel sizes glyph"};
+        throw std::runtime_error{"failed to set pixel sizes"};
     }
 
     const auto rasterInfo = getInfo(face_, text);
@@ -135,7 +130,7 @@ IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelS
         rasterInfo.bufferWidth + 2 * margin,
         rasterInfo.bufferHeight + 2 * margin};
 
-    FT_Pos left = margin;
+    auto left = static_cast<FT_Pos>(margin);
 
     const FT_Bool hasKerning = FT_HAS_KERNING(face_);
     FT_UInt previousGlyphIndex = 0;
@@ -150,7 +145,7 @@ IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelS
         const auto slot = face_->glyph;
 
         FT_Int top = margin + rasterInfo.maxBearingY - face_->glyph->bitmap_top;
-        if (top < margin) {
+        if (top < static_cast<FT_Int>(margin)) {
             top = margin;
         }
         drawBitamp(&buffer, static_cast<size_t>(left), static_cast<size_t>(top), &slot->bitmap);
