@@ -8,9 +8,17 @@ mark_as_advanced(
 
 macro(package_add_test TESTNAME)
     add_executable(${TESTNAME} ${ARGN})
-    target_link_libraries(${TESTNAME} gtest gmock gtest_main makemeglow)
+    target_link_libraries(${TESTNAME}
+        makemeglow
+        gtest gmock gtest_main
+        ${PNG_LIBRARY} ${FREETYPE_LIBRARIES})
     add_test(NAME ${TESTNAME} COMMAND ${TESTNAME})
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-package_add_test(glowtest glow_test.cpp color_test.cpp)
+include_directories(${PROJECT_SOURCE_DIR}/src)
+
+package_add_test(glowtest
+    color_test.cpp
+    font_rasterizer_test.cpp
+    run_tests.cpp)

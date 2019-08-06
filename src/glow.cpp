@@ -1,5 +1,6 @@
 #include "makemeglow/glow.h"
 #include "font_rasterizer.h"
+#include "gauss.h"
 
 #include <algorithm>
 #include <array>
@@ -11,8 +12,15 @@ namespace glow {
 
 namespace {
 
-ColorBuffer gaussianBlur(const IntensityBuffer& buffer, const std::vector<float>& weights)
+ColorBuffer gaussianBlur(
+    const IntensityBuffer& buffer,
+    const std::vector<float>& weights,
+    Color textColor,
+    Color backgroundColor)
 {
+    // TODO apply backgroundColor
+    // TODO make real color blending
+
     const int yLimit = static_cast<int>(buffer.height());
     const int xLimit = static_cast<int>(buffer.width());
     const int radius = static_cast<int>(weights.size());
@@ -46,13 +54,12 @@ ColorBuffer gaussianBlur(const IntensityBuffer& buffer, const std::vector<float>
                 }
             }
 
-            const auto intensity = std::max(static_cast<uint8_t>(std::clamp(res, 0.f, 255.f)), buffer.at(x, y));
-            const Color c{
-                static_cast<uint8_t>(231 * (intensity / 255.f)),
-                static_cast<uint8_t>(89 * (intensity / 255.f)),
-                static_cast<uint8_t>(163 * (intensity / 255.f)),
+            const auto intensity = std::max(static_cast<uint8_t>(std::clamp(res, 0.f, 255.f)), buffer.at(x, y)) / 255.f;
+            verticalPass.at(x, y) = Color{
+                static_cast<uint8_t>(textColor.r() * intensity),
+                static_cast<uint8_t>(textColor.g() * intensity),
+                static_cast<uint8_t>(textColor.b() * intensity),
                 255};
-            verticalPass.at(x, y) = c;
         }
     }
 
@@ -61,28 +68,18 @@ ColorBuffer gaussianBlur(const IntensityBuffer& buffer, const std::vector<float>
 
 } // namespace
 
-void some(FontRasterizer& rr, size_t px)
+ColorBuffer rasterize(
+    const std::string& text,
+    const std::string& font,
+    size_t pixelSize,
+    Color textColor,
+    Color BackgroundColor)
 {
-    const std::string s = "./junk/" + std::to_string(px) + "px.png";
-    const std::string text{"makemeglow"};
-    const std::vector<float> weights{0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.016216f};
-    writePng(s, gaussianBlur(rr.rasterize(text, px), weights));
-}
-
-void foo()
-{
-    FontRasterizer rr{"/usr/share/fonts/truetype/ubuntu/Ubuntu-C.ttf"};
-    some(rr, 10);
-    some(rr, 15);
-    some(rr, 20);
-    some(rr, 25);
-    some(rr, 30);
-    some(rr, 40);
-    some(rr, 50);
-    some(rr, 80);
-    some(rr, 100);
-    some(rr, 150);
-    some(rr, 200);
+    // weights to get margin
+    const auto weights = createGauss1dKernel();
+    FontRasterizer rasterizer{font};
+    const auto intesityBuffer = rasterizer.rasterize(text, pixelSize, /*margin*/ weights.size());
+    return gaussianBlur(intesityBuffer, weights, textColor, BackgroundColor);
 }
 
 } // namespace glow

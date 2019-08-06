@@ -1,11 +1,4 @@
-#include "makemeglow/glow.h"
-
 #include <gtest/gtest.h>
-
-TEST(FooTest, SampleTest)
-{
-    ASSERT_NO_THROW(glow::foo());
-}
 
 int main(int argc, char** argv)
 {
