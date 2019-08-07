@@ -1,4 +1,5 @@
 #include "makemeglow/glow.h"
+#include "makemeglow/png.h"
 
 #include <cxxopts.hpp>
 

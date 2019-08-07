@@ -1,5 +1,7 @@
-#include "font_rasterizer.h"
 #include "test_data.h"
+
+#include "makemeglow/font_rasterizer.h"
+#include "makemeglow/png.h"
 
 #include <gtest/gtest.h>
 
@@ -41,7 +43,7 @@ TEST(FontRasterizerTest, CheckMargins)
 {
     auto rr = glow::FontRasterizer{fontPath("Farro-Light.ttf")};
 
-    for (auto margin : {0, 10}) {
+    for (const auto margin : {0, 10}) {
         auto intensities = rr.rasterize("", /*pxSize*/ 42, margin);
         ASSERT_EQ(intensities.width(), 2 * margin);
         ASSERT_EQ(intensities.height(), 2 * margin);

@@ -1,5 +1,5 @@
 #include "makemeglow/glow.h"
-#include "font_rasterizer.h"
+#include "makemeglow/font_rasterizer.h"
 #include "gauss.h"
 
 #include <algorithm>

@@ -3,7 +3,6 @@
 #include "color.h"
 
 #include <cstddef>
-#include <exception>
 #include <string>
 #include <vector>
 
@@ -65,7 +64,5 @@ private:
 
 using IntensityBuffer = Buffer<uint8_t>;
 using ColorBuffer = Buffer<Color>;
-
-void writePng(const std::string& filename, const ColorBuffer& buffer);
 
 } // namespace glow
