@@ -18,7 +18,7 @@ endmacro()
 
 # pass test data path
 set(TEST_DATA_PATH "${CMAKE_CURRENT_SOURCE_DIR}/data")
-configure_file(test_data.h.in test_data.h @ONLY)
+configure_file(test_data_path.h.in test_data_path.h @ONLY)
 
 include_directories(${PROJECT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -26,4 +26,5 @@ package_add_test(glowtest
     color_test.cpp
     font_rasterizer_test.cpp
     gauss_test.cpp
+    read_png.cpp
     run_tests.cpp)

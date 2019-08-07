@@ -1,5 +1,5 @@
-#include "makemeglow/glow.h"
 #include "makemeglow/font_rasterizer.h"
+#include "makemeglow/glow.h"
 #include "makemeglow/png.h"
 
 #include <iostream>

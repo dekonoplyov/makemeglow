@@ -1,50 +1,50 @@
+#include "read_png.h"
 #include "test_data.h"
 
 #include "makemeglow/font_rasterizer.h"
-#include "makemeglow/png.h"
 
 #include <gtest/gtest.h>
 
-std::string fontPath(const std::string& fontname, bool scalable = true)
-{
-    return std::string{TEST_DATA_PATH} + "/font/"
-        + (scalable ? "scalable" : "non_scalable")
-        + "/" + fontname;
-}
-
 TEST(FontRasterizerTest, NonExistentFont)
 {
-    ASSERT_THROW(glow::FontRasterizer{"/non/existent/font.ttf"}, std::runtime_error);
+    using namespace glow;
+
+    ASSERT_THROW(FontRasterizer{"/non/existent/font.ttf"}, std::runtime_error);
 }
 
 TEST(FontRasterizerTest, CorruptedFont)
 {
-    ASSERT_THROW(glow::FontRasterizer{fontPath("corrupted-cherry-10-r.bdf", false)},
+    using namespace glow;
+    ASSERT_THROW(FontRasterizer{fontPath("corrupted-cherry-10-r.bdf")},
         std::runtime_error);
 }
 
 TEST(FontRasterizerTest, ExistentFont)
 {
-    ASSERT_NO_THROW(glow::FontRasterizer{fontPath("Farro-Light.ttf")});
-    ASSERT_NO_THROW(glow::FontRasterizer{fontPath("Hado2-Regular.otf")});
-    ASSERT_NO_THROW(glow::FontRasterizer{fontPath("NotoSansJP-Black.otf")});
-    ASSERT_NO_THROW(glow::FontRasterizer{fontPath("cherry-10-r.bdf", false)});
+    using namespace glow;
+
+    ASSERT_NO_THROW(FontRasterizer{fontPath("Farro-Light.ttf")});
+    ASSERT_NO_THROW(FontRasterizer{fontPath("Hado2-Regular.otf")});
+    ASSERT_NO_THROW(FontRasterizer{fontPath("NotoSansJP-Black.otf")});
+    ASSERT_NO_THROW(FontRasterizer{fontPath("cherry-10-r.bdf")});
 }
 
 TEST(FontRasterizerTest, ScaleNonScalableFont)
 {
-    auto rr = glow::FontRasterizer{fontPath("cherry-10-r.bdf", false)};
+    using namespace glow;
+    FontRasterizer rasretizer{fontPath("cherry-10-r.bdf")};
 
-    ASSERT_THROW(rr.rasterize("", 11), std::runtime_error);
-    ASSERT_NO_THROW(rr.rasterize("", 10));
+    ASSERT_THROW(rasretizer.rasterize("", 11), std::runtime_error);
+    ASSERT_NO_THROW(rasretizer.rasterize("", 10));
 }
 
 TEST(FontRasterizerTest, CheckMargins)
 {
-    auto rr = glow::FontRasterizer{fontPath("Farro-Light.ttf")};
+    using namespace glow;
+    FontRasterizer rasretizer{fontPath("Farro-Light.ttf")};
 
     for (const auto margin : {0, 10}) {
-        auto intensities = rr.rasterize("", /*pxSize*/ 42, margin);
+        auto intensities = rasretizer.rasterize("", /*pxSize*/ 42, margin);
         ASSERT_EQ(intensities.width(), 2 * margin);
         ASSERT_EQ(intensities.height(), 2 * margin);
     }
@@ -52,8 +52,23 @@ TEST(FontRasterizerTest, CheckMargins)
 
 TEST(FontRasterizerTest, NonASCII)
 {
-    auto rr = glow::FontRasterizer{fontPath("Farro-Light.ttf")};
+    using namespace glow;
+    auto rr = FontRasterizer{fontPath("Farro-Light.ttf")};
     ASSERT_NO_THROW(rr.rasterize("привет", 10));
 }
 
-// TODO one color png write
+TEST(FontRasterizerTest, ScalableASCII)
+{
+    using namespace glow;
+    const auto fontnames = {"NotoSansJP-Black.otf", "Farro-Light.ttf"};
+    const auto sizes = {10, 15, 20, 25, 30, 40, 50, 80, 100, 200};
+    const auto allASCII = allASCIIChars();
+    for (const auto& fontname : fontnames) {
+        FontRasterizer rasretizer{fontPath(fontname)};
+        for (const auto size : sizes) {
+            const auto buffer = rasretizer.rasterize(allASCII, size);
+            const auto canon = readPng(pngPath(pngName(fontname, size)));
+            ASSERT_TRUE(isEquals(buffer, canon));
+        }
+    }
+}

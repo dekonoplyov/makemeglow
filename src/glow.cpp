@@ -72,8 +72,8 @@ ColorBuffer rasterize(
     // weights to get margin
     const auto weights = createGauss1dKernel();
     FontRasterizer rasterizer{font};
-    const auto intesityBuffer = rasterizer.rasterize(text, pixelSize, /*margin*/ weights.size());
-    return gaussianBlur(intesityBuffer, weights, textColor, BackgroundColor);
+    const auto intensityBuffer = rasterizer.rasterize(text, pixelSize, /*margin*/ weights.size());
+    return gaussianBlur(intensityBuffer, weights, textColor, BackgroundColor);
 }
 
 } // namespace glow
