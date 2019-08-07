@@ -16,7 +16,11 @@ macro(package_add_test TESTNAME)
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-include_directories(${PROJECT_SOURCE_DIR}/src)
+# pass test data path
+set(TEST_DATA_PATH "${CMAKE_CURRENT_SOURCE_DIR}/data")
+configure_file(test_data.h.in test_data.h @ONLY)
+
+include_directories(${PROJECT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR})
 
 package_add_test(glowtest
     color_test.cpp
