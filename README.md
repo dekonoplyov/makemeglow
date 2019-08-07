@@ -2,7 +2,25 @@
 Text rasterizer lib with glowing effect.
 
 # Quick start
+## Build
 
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+
+## Run tests
+```
+make tests
+```
+
+## Render text
+You can use glow app.
+```
+./glow_app -f /path/to/font/file.ttf "positional args are parts of text to render"
+```
 
 # Requirements
 Compiler with C++17 support.
@@ -21,6 +39,10 @@ Install on Mac
 brew install libpng
 brew install freetype
 ```
+
+Lib also uses gtest and cxxopts, but they're git submodules, so you shouldn't worry.
+
+# Requirements
 
 
 # TODO list
