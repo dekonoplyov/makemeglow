@@ -1,7 +1,7 @@
-#include "read_png.h"
 #include "test_data.h"
 
 #include "makemeglow/font_rasterizer.h"
+#include "makemeglow/png.h"
 
 #include <gtest/gtest.h>
 
@@ -62,12 +62,12 @@ TEST(FontRasterizerTest, ScalableASCII)
     using namespace glow;
     const auto fontnames = {"NotoSansJP-Black.otf", "Farro-Light.ttf"};
     const auto sizes = {10, 15, 20, 25, 30, 40, 50, 80, 100, 200};
-    const auto allASCII = allASCIIChars();
+    const auto allASCII = visibleASCIIChars();
     for (const auto& fontname : fontnames) {
         FontRasterizer rasretizer{fontPath(fontname)};
         for (const auto size : sizes) {
             const auto buffer = rasretizer.rasterize(allASCII, size);
-            const auto canon = readPng(pngPath(pngName(fontname, size)));
+            const auto canon = readGrayPng(grayPngPath(pngName(fontname, size)));
             ASSERT_TRUE(isEquals(buffer, canon));
         }
     }

@@ -8,22 +8,27 @@
 
 namespace glow {
 
-std::string fontPath(const std::string& fontname)
+inline std::string fontPath(const std::string& fontname)
 {
     return std::string{TEST_DATA_PATH} + "/font/" + fontname;
 }
 
-std::string pngPath(const std::string& filename)
+inline std::string grayPngPath(const std::string& filename)
 {
     return std::string{TEST_DATA_PATH} + "/png/gray/" + filename;
 }
 
-std::string pngName(const std::string& fontname, size_t size)
+inline std::string rgbaPngPath(const std::string& filename)
+{
+    return std::string{TEST_DATA_PATH} + "/png/rgba/" + filename;
+}
+
+inline std::string pngName(const std::string& fontname, size_t size)
 {
     return fontname + std::to_string(size) + ".png";
 }
 
-std::string allASCIIChars()
+inline std::string visibleASCIIChars()
 {
     return " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 }
