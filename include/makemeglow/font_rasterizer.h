@@ -2,23 +2,22 @@
 
 #include "makemeglow/color_buffer.h"
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include <memory>
 
 namespace glow {
+
 
 // TODO make nice api
 class FontRasterizer {
 public:
     FontRasterizer(const std::string& font);
-
     ~FontRasterizer();
 
     IntensityBuffer rasterize(const std::string& text, size_t pixelSize, size_t margin = 0);
 
 private:
-    FT_Library library_;
-    FT_Face face_;
+    class FontRasterizerImpl;
+    std::unique_ptr<FontRasterizerImpl> impl_;
 };
 
 } // namespace glow

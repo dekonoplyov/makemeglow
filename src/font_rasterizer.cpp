@@ -1,7 +1,9 @@
 #include "makemeglow/font_rasterizer.h"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include <algorithm>
-#include <iostream>
 #include <stdexcept>
 
 namespace glow {
@@ -10,8 +12,7 @@ namespace {
 
 void initFTLibrary(FT_Library* library)
 {
-    const auto error = FT_Init_FreeType(library);
-    if (error != 0) {
+    if (FT_Init_FreeType(library) != 0) {
         throw std::runtime_error{"failed to init library "};
     }
 }
@@ -30,6 +31,22 @@ void loadFont(FT_Library* library, FT_Face* face, const std::string& font)
             "the font file could not be opened or read, or that it is broken"};
     }
 }
+
+struct FTLibGuard {
+    FTLibGuard(FT_Library* library)
+        : library_{library}
+    {
+    }
+
+    ~FTLibGuard()
+    {
+        if (library_) {
+            FT_Done_FreeType(*library_);
+        }
+    }
+
+    FT_Library* library_;
+};
 
 void loadGlyph(FT_Face face, char c)
 {
@@ -107,56 +124,78 @@ void drawBitamp(IntensityBuffer* buffer, size_t left, size_t top, FT_Bitmap* bit
 
 } // namespace
 
+class FontRasterizer::FontRasterizerImpl {
+public:
+    FontRasterizerImpl(const std::string& font)
+        : library_{nullptr}
+        , guard_{&library_}
+        , face_{nullptr}
+    {
+
+        initFTLibrary(&library_);
+        loadFont(&library_, &face_, font);
+    }
+
+    IntensityBuffer rasterize(const std::string& text, size_t pixelSize, size_t margin)
+    {
+
+        if (FT_Set_Pixel_Sizes(face_, 0, pixelSize) != 0) {
+            throw std::runtime_error{"failed to set pixel sizes"};
+        }
+
+        const auto rasterInfo = getInfo(face_, text);
+        IntensityBuffer buffer{
+            rasterInfo.bufferWidth + 2 * margin,
+            rasterInfo.bufferHeight + 2 * margin};
+
+        auto left = static_cast<FT_Pos>(margin);
+
+        const FT_Bool hasKerning = FT_HAS_KERNING(face_);
+        FT_UInt previousGlyphIndex = 0;
+
+        for (const auto c : text) {
+            const auto glyphIndex = FT_Get_Char_Index(face_, c);
+            if (hasKerning && previousGlyphIndex != 0 && glyphIndex != 0) {
+                left += getKerning(face_, previousGlyphIndex, glyphIndex);
+            }
+
+            loadGlyph(face_, c);
+            const auto slot = face_->glyph;
+
+            FT_Int top = margin + rasterInfo.maxBearingY - face_->glyph->bitmap_top;
+            if (top < static_cast<FT_Int>(margin)) {
+                top = margin;
+            }
+            drawBitamp(&buffer,
+                static_cast<size_t>(left), static_cast<size_t>(top),
+                &slot->bitmap);
+
+            left += slot->advance.x >> 6;
+
+            // update glyphIndex for kerning
+            previousGlyphIndex = glyphIndex;
+        }
+
+        return buffer;
+    }
+
+private:
+    FT_Library library_;
+    FTLibGuard guard_;
+    FT_Face face_;
+};
+
 FontRasterizer::FontRasterizer(const std::string& font)
+    : impl_{std::make_unique<FontRasterizerImpl>(font)}
 {
-    initFTLibrary(&library_);
-    loadFont(&library_, &face_, font);
 }
 
-FontRasterizer::~FontRasterizer()
-{
-    FT_Done_Face(face_);
-    FT_Done_FreeType(library_);
-}
+// for pimpl
+FontRasterizer::~FontRasterizer() = default;
 
 IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelSize, size_t margin)
 {
-    if (FT_Set_Pixel_Sizes(face_, 0, pixelSize) != 0) {
-        throw std::runtime_error{"failed to set pixel sizes"};
-    }
-
-    const auto rasterInfo = getInfo(face_, text);
-    IntensityBuffer buffer{
-        rasterInfo.bufferWidth + 2 * margin,
-        rasterInfo.bufferHeight + 2 * margin};
-
-    auto left = static_cast<FT_Pos>(margin);
-
-    const FT_Bool hasKerning = FT_HAS_KERNING(face_);
-    FT_UInt previousGlyphIndex = 0;
-
-    for (const auto c : text) {
-        const auto glyphIndex = FT_Get_Char_Index(face_, c);
-        if (hasKerning && previousGlyphIndex != 0 && glyphIndex != 0) {
-            left += getKerning(face_, previousGlyphIndex, glyphIndex);
-        }
-
-        loadGlyph(face_, c);
-        const auto slot = face_->glyph;
-
-        FT_Int top = margin + rasterInfo.maxBearingY - face_->glyph->bitmap_top;
-        if (top < static_cast<FT_Int>(margin)) {
-            top = margin;
-        }
-        drawBitamp(&buffer, static_cast<size_t>(left), static_cast<size_t>(top), &slot->bitmap);
-
-        left += slot->advance.x >> 6;
-
-        // update glyphIndex for kerning
-        previousGlyphIndex = glyphIndex;
-    }
-
-    return buffer;
+    return impl_->rasterize(text, pixelSize, margin);
 }
 
 } // namespace glow
