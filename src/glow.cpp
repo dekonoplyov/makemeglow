@@ -6,7 +6,6 @@
 #include <array>
 #include <cstdint>
 #include <exception>
-#include <iostream>
 
 namespace glow {
 

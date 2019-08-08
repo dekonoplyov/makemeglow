@@ -138,9 +138,8 @@ public:
 
     IntensityBuffer rasterize(const std::string& text, size_t pixelSize, size_t margin)
     {
-
         if (FT_Set_Pixel_Sizes(face_, 0, pixelSize) != 0) {
-            throw std::runtime_error{"failed to set pixel sizes"};
+            throw std::runtime_error{"failed to set pixel size"};
         }
 
         const auto rasterInfo = getInfo(face_, text);

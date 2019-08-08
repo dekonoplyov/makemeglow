@@ -1,7 +1,6 @@
 #include "gauss.h"
 
 #include <cmath>
-#include <iostream>
 
 namespace glow {
 
