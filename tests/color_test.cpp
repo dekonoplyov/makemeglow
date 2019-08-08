@@ -48,3 +48,28 @@ TEST(ColorTest, FourChanelsConstructor)
         ASSERT_EQ(c.a(), 255);
     }
 }
+
+TEST(ColorTest, Blend)
+{
+    {
+        const glow::Color bg{200, 117, 12, 250};
+        const glow::Color fg{42, 13, 150, 130};
+        auto blended = glow::blendColors(bg, fg);
+
+        ASSERT_EQ(blended.r(), 118);
+        ASSERT_EQ(blended.g(), 63);
+        ASSERT_EQ(blended.b(), 82);
+        ASSERT_EQ(blended.a(), 188);
+    }
+
+    {
+        const glow::Color bg{200, 0, 12};
+        const glow::Color fg{0, 13, 150};
+        auto blended = glow::blendColors(bg, fg);
+
+        ASSERT_EQ(blended.r(), 0);
+        ASSERT_EQ(blended.g(), 12);
+        ASSERT_EQ(blended.b(), 149);
+        ASSERT_EQ(blended.a(), 254);
+    }
+}
