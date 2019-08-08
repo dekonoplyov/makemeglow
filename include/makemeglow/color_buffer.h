@@ -22,7 +22,7 @@ public:
     Buffer(size_t width, size_t height)
         : width_{width}
         , height_{height}
-        , buffer_{std::vector<T>(width_ * height_)}
+        , buffer_{std::vector<T>(width_ * height_, T{})}
     {
     }
 
