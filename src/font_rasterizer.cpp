@@ -10,10 +10,26 @@ namespace glow {
 
 namespace {
 
+struct FTLibGuard {
+    FTLibGuard(FT_Library* library)
+        : library_{library}
+    {
+    }
+
+    ~FTLibGuard()
+    {
+        if (library_ != nullptr) {
+            FT_Done_FreeType(*library_);
+        }
+    }
+
+    FT_Library* library_;
+};
+
 void initFTLibrary(FT_Library* library)
 {
     if (FT_Init_FreeType(library) != 0) {
-        throw std::runtime_error{"failed to init library "};
+        throw std::runtime_error{"Failed to init freetype library"};
     }
 }
 
@@ -25,33 +41,24 @@ void loadFont(FT_Library* library, FT_Face* face, const std::string& font)
         face);
     if (error == FT_Err_Unknown_File_Format) {
         throw std::runtime_error{
-            "the font file could be opened and read, but font format is unsupported"};
+            "The font file could be opened and read, but font format is unsupported"};
     } else if (error != 0) {
         throw std::runtime_error{
-            "the font file could not be opened or read, or that it is broken"};
+            "The font file could not be opened or read, or that it is broken"};
     }
 }
 
-struct FTLibGuard {
-    FTLibGuard(FT_Library* library)
-        : library_{library}
-    {
+void checkScalability(FT_Face face)
+{
+    if (FT_IS_SCALABLE(face) == 0) {
+        throw std::runtime_error{"Non scalable fonts aren't supported"};
     }
-
-    ~FTLibGuard()
-    {
-        if (library_) {
-            FT_Done_FreeType(*library_);
-        }
-    }
-
-    FT_Library* library_;
-};
+}
 
 void loadGlyph(FT_Face face, char c)
 {
     if (FT_Load_Char(face, c, FT_LOAD_RENDER) != 0) {
-        throw std::runtime_error{"failed to load glyph"};
+        throw std::runtime_error{"Failed to load glyph"};
     }
 }
 
@@ -131,15 +138,15 @@ public:
         , guard_{&library_}
         , face_{nullptr}
     {
-
         initFTLibrary(&library_);
         loadFont(&library_, &face_, font);
+        checkScalability(face_);
     }
 
     IntensityBuffer rasterize(const std::string& text, size_t pixelSize, size_t margin)
     {
         if (FT_Set_Pixel_Sizes(face_, 0, pixelSize) != 0) {
-            throw std::runtime_error{"failed to set pixel size"};
+            throw std::runtime_error{"Failed to set pixel size"};
         }
 
         const auto rasterInfo = getInfo(face_, text);

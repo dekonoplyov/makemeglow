@@ -8,41 +8,35 @@
 TEST(FontRasterizerTest, NonExistentFont)
 {
     using namespace glow;
-
     ASSERT_THROW(FontRasterizer{"/non/existent/font.ttf"}, std::runtime_error);
 }
 
 TEST(FontRasterizerTest, CorruptedFont)
 {
     using namespace glow;
-    ASSERT_THROW(FontRasterizer{fontPath("corrupted-cherry-10-r.bdf")},
+    ASSERT_THROW(FontRasterizer{fontPath("my_font.txt")},
+        std::runtime_error);
+}
+
+TEST(FontRasterizerTest, NonScalableFont)
+{
+    using namespace glow;
+    ASSERT_THROW(FontRasterizer{fontPath("cherry-10-r.bdf")},
         std::runtime_error);
 }
 
 TEST(FontRasterizerTest, ExistentFont)
 {
     using namespace glow;
-
     ASSERT_NO_THROW(FontRasterizer{fontPath("Farro-Light.ttf")});
     ASSERT_NO_THROW(FontRasterizer{fontPath("Hado2-Regular.otf")});
     ASSERT_NO_THROW(FontRasterizer{fontPath("NotoSansJP-Black.otf")});
-    ASSERT_NO_THROW(FontRasterizer{fontPath("cherry-10-r.bdf")});
-}
-
-TEST(FontRasterizerTest, ScaleNonScalableFont)
-{
-    using namespace glow;
-    FontRasterizer rasretizer{fontPath("cherry-10-r.bdf")};
-
-    ASSERT_THROW(rasretizer.rasterize("", 11), std::runtime_error);
-    ASSERT_NO_THROW(rasretizer.rasterize("", 10));
 }
 
 TEST(FontRasterizerTest, CheckMargins)
 {
     using namespace glow;
     FontRasterizer rasretizer{fontPath("Farro-Light.ttf")};
-
     for (const auto margin : {0, 10}) {
         auto intensities = rasretizer.rasterize("", /*pxSize*/ 42, margin);
         ASSERT_EQ(intensities.width(), 2 * margin);
@@ -57,7 +51,7 @@ TEST(FontRasterizerTest, NonASCII)
     ASSERT_NO_THROW(rr.rasterize("привет", 10));
 }
 
-TEST(FontRasterizerTest, ScalableASCII)
+TEST(FontRasterizerTest, RasterASCII)
 {
     using namespace glow;
     const auto fontnames = {"NotoSansJP-Black.otf", "Farro-Light.ttf"};
