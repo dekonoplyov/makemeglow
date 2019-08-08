@@ -124,7 +124,7 @@ void drawBitamp(IntensityBuffer* buffer, size_t left, size_t top, FT_Bitmap* bit
         for (size_t x = 0; x < bitmap->width; ++x) {
             buffer->at(left + x, top + y) = std::max(
                 buffer->at(left + x, top + y),
-                static_cast<uint8_t>(bitmap->buffer[y * bitmap->width + x]));
+                bitmap->buffer[y * bitmap->width + x]);
         }
     }
 }
