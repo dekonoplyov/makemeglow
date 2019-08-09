@@ -33,20 +33,23 @@ public:
         if (file_ != nullptr) {
             fclose(file_);
         }
-        if (png_ != nullptr) {
+
+        if (*png_ != nullptr) {
+            if (*info_ != nullptr) {
+                png_destroy_info_struct(*png_, info_);
+            }
+
             switch (mode_) {
             case PngIOMode::Read:
-                png_destroy_read_struct(png_, info_, nullptr);
+                png_destroy_read_struct(png_, nullptr, nullptr);
                 break;
             case PngIOMode::Write:
-                png_destroy_write_struct(png_, info_);
+                png_destroy_write_struct(png_, nullptr);
                 break;
             }
         }
 
-        if (row_ != nullptr) {
-            delete[](*row_);
-        }
+        delete[](*row_);
     }
 
 public:
