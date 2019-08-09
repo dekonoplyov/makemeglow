@@ -14,28 +14,23 @@ void checkEquality(const std::vector<float>& expected, const std::vector<float> 
 
 } // namespace
 
-TEST(GaussTest, ZeroRadius)
+TEST(GaussTest, EvenKernelSize)
 {
-    const auto weights = glow::createGauss1dKernel(0);
-    ASSERT_TRUE(weights.empty());
+    ASSERT_THROW(glow::gauss1dKernel(0, 1.f), std::runtime_error);
+    ASSERT_THROW(glow::gauss1dKernel(6, 16.f), std::runtime_error);
 }
 
-TEST(GaussTest, EvenRadius)
+TEST(GaussTest, Values)
 {
-    const auto weights = glow::createGauss1dKernel(6);
-    ASSERT_EQ(weights.size(), 7);
-}
+    {
+        const std::vector<float> expected{1.f};
+        const auto weights = glow::gauss1dKernel(1, 4.f);
+        checkEquality(expected, weights);
+    }
 
-TEST(GaussTest, Defaults)
-{
-    const std::vector<float> expected{0.39894345f, 0.24197143f, 0.053991124f, 0.0044318615f, 0.00013383062f};
-    const auto weights = glow::createGauss1dKernel();
-    checkEquality(expected, weights);
-}
-
-TEST(GaussTest, NonDefaults)
-{
-    const std::vector<float> expected{0.21260943, 0.20606813, 0.18762717};
-    const auto weights = glow::createGauss1dKernel(3, 4.f);
-    checkEquality(expected, weights);
+    {
+        const std::vector<float> expected{0.18092f, 0.168448f, 0.13595733f, 0.0951256f, 0.0576966f};
+        const auto weights = glow::gauss1dKernel(9, 7.f);
+        checkEquality(expected, weights);
+    }
 }

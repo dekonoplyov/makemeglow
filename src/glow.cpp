@@ -1,6 +1,7 @@
+#include "gauss.h"
+
 #include "makemeglow/glow.h"
 #include "makemeglow/font_rasterizer.h"
-#include "gauss.h"
 
 #include <algorithm>
 #include <array>
@@ -24,6 +25,7 @@ ColorBuffer gaussianBlur(
     IntensityBuffer horizontalPass{buffer.width(), buffer.height()};
     for (int y = 0; y < yLimit; ++y) {
         for (int x = 0; x < xLimit; ++x) {
+            // TODO fix empty weights
             float res = static_cast<float>(buffer.at(x, y)) * weights[0];
             for (int i = 1; i < radius; ++i) {
                 if (x + i < xLimit) {
@@ -66,12 +68,12 @@ ColorBuffer rasterize(
     const std::string& font,
     size_t pixelSize,
     Color textColor,
-    Color BackgroundColor)
+    Color BackgroundColor,
+    GlowParams glowParams)
 {
-    // weights to get margin
-    const auto weights = createGauss1dKernel();
+    const auto weights = gauss1dKernel(glowParams.kernelSize, glowParams.sigma);
     FontRasterizer rasterizer{font};
-    const auto intensityBuffer = rasterizer.rasterize(text, pixelSize, /*margin*/ weights.size());
+    const auto intensityBuffer = rasterizer.rasterize(text, pixelSize, glowParams.kernelSize / 2);
     return gaussianBlur(intensityBuffer, weights, textColor, BackgroundColor);
 }
 

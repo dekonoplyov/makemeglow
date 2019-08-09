@@ -2,7 +2,7 @@
 
 #include "test_data_path.h"
 
-#include "makemeglow/color_buffer.h"
+#include "makemeglow/buffer.h"
 
 #include <string>
 

@@ -22,6 +22,7 @@ float clampChannel(float f)
 
 Color blendColors(Color bg, Color fg)
 {
+    // TODO fix bg alpha
     // treat nums as 8.8 fixed-point
     const uint32_t alpha = fg.a();
     const uint32_t invAlpha = (255 - alpha);

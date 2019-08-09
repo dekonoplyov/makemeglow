@@ -25,10 +25,10 @@ glow::Color parseColor(const std::string& s)
     uint32_t value = 0;
     const auto substr = s.substr(1);
     if (substr.size() == 6) {
-        value = strtoul(substr.c_str(), nullptr, /* basse*/ 16);
+        value = strtoul(substr.c_str(), nullptr, /* base*/ 16);
         value = (value << 8) | 0xff;
     } else if (substr.size() == 8) {
-        value = strtoul(substr.c_str(), nullptr, /* basse*/ 16);
+        value = strtoul(substr.c_str(), nullptr, /* base*/ 16);
     } else {
         throw std::runtime_error{"Color format is #RRGGBB{AA}"};
     }
@@ -66,8 +66,8 @@ cxxopts::Options createProgramOptions()
             cxxopts::value<std::string>()->default_value("#100f00"))
         ("s,size", "Text size in pixels",
             cxxopts::value<size_t>()->default_value("20"))
-        ("radius", "Raduis of Gaussian blur in pixels",
-            cxxopts::value<size_t>()->default_value("5"))
+        ("kernel", "Kernel size of Gaussian blur in pixels",
+            cxxopts::value<size_t>()->default_value("7"))
         ("sigma", "Sigma parameter of Gaussian blur",
             cxxopts::value<float>()->default_value("1.f"));
     // clang-format on
@@ -83,7 +83,7 @@ struct RasterParams {
     size_t pixelSize;
     glow::Color textColor;
     glow::Color backgroundColor;
-    size_t radius;
+    size_t kernelSize;
     float sigma;
 };
 
@@ -96,7 +96,7 @@ RasterParams getRasterParams(const cxxopts::ParseResult& args)
     params.pixelSize = args["size"].as<size_t>();
     params.textColor = parseColor(args["color"].as<std::string>());
     params.backgroundColor = parseColor(args["background"].as<std::string>());
-    params.radius = args["radius"].as<size_t>();
+    params.kernelSize = args["kernel"].as<size_t>();
     params.sigma = args["sigma"].as<float>();
 
     return params;
@@ -106,7 +106,8 @@ glow::ColorBuffer rasterize(const RasterParams& params)
 {
     return glow::rasterize(params.text, params.font,
         params.pixelSize,
-        params.textColor, params.backgroundColor);
+        params.textColor, params.backgroundColor,
+        glow::GlowParams{params.kernelSize, params.sigma});
 }
 
 } // namespace

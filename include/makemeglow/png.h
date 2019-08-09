@@ -1,6 +1,6 @@
 #pragma once
 
-#include "makemeglow/color_buffer.h"
+#include "makemeglow/buffer.h"
 
 namespace glow {
 

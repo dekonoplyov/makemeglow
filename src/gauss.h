@@ -4,12 +4,17 @@
 
 namespace glow {
 
-// TODO fix description
 /*
- * returns right half of Gaussian curve
- * we can skip other half due to its symmetric shape
- * if radius is even number greater than zero it will be increased to the nearest odd
+ * <Description>  
+ *    Returns right half of central row from Gaussian kernel
+ *    https://en.wikipedia.org/wiki/Gaussian_blur
+ *    This can be used to implement two pass Gaussian blur
+ *    https://learnopengl.com/Advanced-Lighting/Bloom
+ * <Input> 
+ *    kernelSize :: size of Gaussian kernel
+ *    sigma2 :: variance is Gaussian function
+ * 
  */
-std::vector<float> createGauss1dKernel(size_t radius = 5, float sigma = 1.f);
+std::vector<float> gauss1dKernel(size_t kernelSize, float sigma2);
 
 } // namespace glow

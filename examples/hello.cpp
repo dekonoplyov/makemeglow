@@ -2,15 +2,13 @@
 #include "makemeglow/glow.h"
 #include "makemeglow/png.h"
 
-#include <iostream>
-
 int main()
 {
     const auto sizes = {10, 15, 20, 25, 30, 40, 50, 80, 100, 150, 200};
     const std::string text = "Some meaningfull text";
     const std::string font = "/usr/share/fonts/truetype/ubuntu/Ubuntu-C.ttf";
     const glow::Color textColor{231, 17, 146};
-    const glow::Color backgroundColor{10, 13, 12, 100};
+    const glow::Color backgroundColor{10, 13, 12};
 
     glow::FontRasterizer rr{font};
     glow::writePng("./junk/gray.png", rr.rasterize(text, 40));

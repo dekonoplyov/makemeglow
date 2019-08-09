@@ -1,35 +1,57 @@
 #include "gauss.h"
 
+#include "makemeglow/buffer.h"
+
 #include <cmath>
+#include <stdexcept>
 
 namespace glow {
 
-std::vector<float> createGauss1dKernel(size_t radius, float sigma)
+namespace {
+
+inline float distance(int x, int y, int offset)
 {
-    if (radius == 0) {
-        return {};
+    return static_cast<float>((x - offset) * (x - offset) + (y - offset) * (y - offset));
+}
+
+} // namespace
+
+std::vector<float> gauss1dKernel(size_t kernelSize, float sigma2)
+{
+    if (kernelSize % 2 == 0) {
+        throw std::runtime_error{"Use odd kernel sizes"};
     }
 
-    if (radius % 2 == 0) {
-        radius += 1;
+    if (kernelSize == 1) {
+        return {1.f};
     }
 
-    std::vector<float> weights(radius);
+    const size_t offset = kernelSize / 2;
+    Buffer<float> weights{kernelSize, kernelSize};
+    float sum = 0.0f;
 
-    const float sigma2 = 2.f * sigma * sigma;
-    float sum = 0.f;
-    for (size_t i = 0; i < radius; ++i) {
-        weights[i] = std::exp(-static_cast<float>(i * i) / sigma2);
-        sum += 2.f * weights[i];
+    for (size_t j = 0; j < kernelSize; ++j) {
+        for (size_t i = 0; i < kernelSize; ++i) {
+            weights.at(i, j) = std::exp(-distance(i, j, offset) / (2.f * sigma2));
+            sum += weights.at(i, j);
+        }
     }
 
-    sum -= weights[0];
+    sum /= sqrt(2.f * M_PI * sigma2);
 
-    for (size_t i = 0; i < radius; ++i) {
-        weights[i] /= sum;
+    for (size_t j = 0; j < weights.width(); ++j) {
+        for (size_t i = 0; i < weights.height(); ++i) {
+            weights.at(i, j) /= sum;
+        }
     }
 
-    return weights;
+    // take right half of central row
+    std::vector<float> kernel;
+    for (size_t i = 0; i <= offset; ++i) {
+        kernel.push_back(weights.at(i + offset, offset));
+    }
+
+    return kernel;
 }
 
 } // namespace glow
