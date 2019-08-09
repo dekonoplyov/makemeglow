@@ -1,7 +1,7 @@
 #include "gauss.h"
 
-#include "makemeglow/glow.h"
 #include "makemeglow/font_rasterizer.h"
+#include "makemeglow/glow.h"
 
 #include <algorithm>
 #include <array>
@@ -18,6 +18,11 @@ ColorBuffer gaussianBlur(
     Color textColor,
     Color backgroundColor)
 {
+    // TODO error message
+    if (weights.empty()) {
+        throw std::runtime_error{"Can't work with empty weights"};
+    }
+
     const int yLimit = static_cast<int>(buffer.height());
     const int xLimit = static_cast<int>(buffer.width());
     const int radius = static_cast<int>(weights.size());
@@ -25,7 +30,6 @@ ColorBuffer gaussianBlur(
     IntensityBuffer horizontalPass{buffer.width(), buffer.height()};
     for (int y = 0; y < yLimit; ++y) {
         for (int x = 0; x < xLimit; ++x) {
-            // TODO fix empty weights
             float res = static_cast<float>(buffer.at(x, y)) * weights[0];
             for (int i = 1; i < radius; ++i) {
                 if (x + i < xLimit) {
@@ -75,6 +79,91 @@ ColorBuffer rasterize(
     FontRasterizer rasterizer{font};
     const auto intensityBuffer = rasterizer.rasterize(text, pixelSize, glowParams.kernelSize / 2);
     return gaussianBlur(intensityBuffer, weights, textColor, BackgroundColor);
+}
+
+class Rasterizer::RasterizerImpl {
+public:
+    RasterizerImpl(const std::string& font)
+        : rasterizer_{font}
+    {
+    }
+
+    ColorBuffer rasterize(
+        const std::string& text,
+        size_t pixelSize,
+        Color textColor,
+        Color backgroundColor)
+    {
+        const auto intensityBuffer = rasterizer_.rasterize(text, pixelSize, /* margin */ 0);
+        return gaussianBlur(intensityBuffer, /* weights */ {1.f}, textColor, backgroundColor);
+    }
+
+    ColorBuffer rasterize(
+        const std::string& text,
+        size_t pixelSize,
+        Color textColor,
+        Color backgroundColor,
+        GlowParams glowParams)
+    {
+        const auto intensityBuffer = rasterizer_.rasterize(text, pixelSize,
+            /* margin */ glowParams.kernelSize / 2);
+        return gaussianBlur(intensityBuffer,
+            gauss1dKernel(glowParams.kernelSize, glowParams.sigma),
+            textColor, backgroundColor);
+    }
+
+    ColorBuffer rasterize(
+        const std::string& text,
+        size_t pixelSize,
+        Color textColor,
+        Color backgroundColor,
+        const std::vector<float>& weights)
+    {
+        const auto intensityBuffer = rasterizer_.rasterize(text, pixelSize,
+            /* margin */ weights.size() - 1);
+        return gaussianBlur(intensityBuffer,
+            weights,
+            textColor, backgroundColor);
+    }
+
+private:
+    FontRasterizer rasterizer_;
+};
+
+Rasterizer::Rasterizer(const std::string& font)
+    : impl_{std::make_unique<RasterizerImpl>(font)}
+{
+}
+
+Rasterizer::~Rasterizer() = default;
+
+ColorBuffer Rasterizer::rasterize(
+    const std::string& text,
+    size_t pixelSize,
+    Color textColor,
+    Color backgroundColor)
+{
+    return impl_->rasterize(text, pixelSize, textColor, backgroundColor);
+}
+
+ColorBuffer Rasterizer::rasterize(
+    const std::string& text,
+    size_t pixelSize,
+    Color textColor,
+    Color backgroundColor,
+    GlowParams glowParams)
+{
+    return impl_->rasterize(text, pixelSize, textColor, backgroundColor, glowParams);
+}
+
+ColorBuffer Rasterizer::rasterize(
+    const std::string& text,
+    size_t pixelSize,
+    Color textColor,
+    Color backgroundColor,
+    const std::vector<float>& weights)
+{
+    return impl_->rasterize(text, pixelSize, textColor, backgroundColor, weights);
 }
 
 } // namespace glow
