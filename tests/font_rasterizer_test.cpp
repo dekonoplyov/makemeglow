@@ -47,7 +47,7 @@ TEST(FontRasterizerTest, CheckMargins)
 TEST(FontRasterizerTest, NonASCII)
 {
     using namespace glow;
-    auto rr = FontRasterizer{fontPath("Farro-Light.ttf")};
+    FontRasterizer rr{fontPath("Farro-Light.ttf")};
     ASSERT_NO_THROW(rr.rasterize("привет", 10));
 }
 

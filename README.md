@@ -23,16 +23,15 @@ You can use glow app.
 ```
 
 # Requirements
-Compiler with C++17 support.
+Compiler with C++14 support.
 
 [Libpng](http://www.libpng.org/pub/png/libpng.html) and [Freetype](https://www.freetype.org/)
 
 Install on Linux
 ```
 sudo apt-get install libpng-dev
-sudo add-apt-repository ppa:glasen/freetype2
-sudo apt update && sudo apt install freetype2-demos
 ```
+To install freetype use one of these links [1](http://ubuntuhandbook.org/index.php/2017/06/install-freetype-2-8-in-ubuntu-16-04-17-04/)[2](http://ubuntuhandbook.org/index.php/2016/09/install-freetype-2-7-ubuntu-16-04/)
 
 Install on Mac
 ```
@@ -41,9 +40,6 @@ brew install freetype
 ```
 
 Lib also uses gtest and cxxopts, but they're git submodules, so you shouldn't worry.
-
-# Requirements
-
 
 # TODO list
 

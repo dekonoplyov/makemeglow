@@ -17,7 +17,7 @@ constexpr uint32_t SCALE_FACTOR = 256;
 
 float clampChannel(float f)
 {
-    return std::clamp(f, FLOAT_COLOR_CHANNEL_MIN, FLOAT_COLOR_CHANNEL_MAX);
+    return std::max(FLOAT_COLOR_CHANNEL_MIN, std::min(f, FLOAT_COLOR_CHANNEL_MAX));
 }
 
 Color blendColors(Color bg, Color fg)

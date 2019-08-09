@@ -3,7 +3,8 @@ project(makemeglow
     LANGUAGES CXX)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -Wcast-align")
-add_compile_options(-std=c++17)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
