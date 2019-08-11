@@ -69,14 +69,13 @@ FT_Pos getKerning(FT_Face face, FT_UInt previous, FT_UInt glyphIndex)
     return delta.x >> 6;
 }
 
-// TODO make meaningfull naming
-struct RasterizerInfo {
+struct FontRasterizerInfo {
     size_t bufferWidth;
     size_t bufferHeight;
     FT_Int maxBearingY;
 };
 
-RasterizerInfo getInfo(FT_Face face, const std::string& text)
+FontRasterizerInfo preprocessText(FT_Face face, const std::string& text)
 {
     // Compute wrapping buffer size
     // lastCharXTail = width - advance
@@ -118,12 +117,12 @@ RasterizerInfo getInfo(FT_Face face, const std::string& text)
         maxBearingY};
 }
 
-void drawBitamp(IntensityBuffer* buffer, size_t left, size_t top, FT_Bitmap* bitmap)
+void drawBitamp(IntensityBuffer& buffer, size_t left, size_t top, FT_Bitmap* bitmap)
 {
     for (size_t y = 0; y < bitmap->rows; ++y) {
         for (size_t x = 0; x < bitmap->width; ++x) {
-            buffer->at(left + x, top + y) = std::max(
-                buffer->at(left + x, top + y),
+            buffer(left + x, top + y) = std::max(
+                buffer(left + x, top + y),
                 bitmap->buffer[y * bitmap->width + x]);
         }
     }
@@ -149,7 +148,7 @@ public:
             throw std::runtime_error{"Failed to set pixel size"};
         }
 
-        const auto rasterInfo = getInfo(face_, text);
+        const auto rasterInfo = preprocessText(face_, text);
         IntensityBuffer buffer{
             rasterInfo.bufferWidth + 2 * margin,
             rasterInfo.bufferHeight + 2 * margin};
@@ -172,7 +171,7 @@ public:
             if (top < static_cast<FT_Int>(margin)) {
                 top = margin;
             }
-            drawBitamp(&buffer,
+            drawBitamp(buffer,
                 static_cast<size_t>(left), static_cast<size_t>(top),
                 &slot->bitmap);
 

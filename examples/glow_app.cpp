@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
     try {
         auto options = createProgramOptions();
         const auto args = options.parse(argc, argv);
-        
+
         if (args.count("help")) {
             std::cout << options.help({"", "Group"}) << std::endl;
             exit(0);
@@ -124,13 +124,11 @@ int main(int argc, char* argv[])
 
         return 0;
     } catch (const cxxopts::OptionException& e) {
-        std::cout << "error parsing options: " << e.what() << std::endl;
-        exit(1);
-    } catch (const std::runtime_error& e) {
-        std::cout << "error rendering text " << e.what() << std::endl;
-        exit(1);
+        std::cout << "Error parsing options: " << e.what() << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl;
     } catch (...) {
         std::cout << "oops...\n";
-        exit(1);
     }
+    exit(1);
 }
