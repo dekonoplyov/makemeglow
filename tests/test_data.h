@@ -18,9 +18,9 @@ inline std::string grayPngPath(const std::string& filename)
     return std::string{TEST_DATA_PATH} + "/png/gray/" + filename;
 }
 
-inline std::string rgbaPngPath(const std::string& filename)
+inline std::string rgbPngPath(const std::string& filename)
 {
-    return std::string{TEST_DATA_PATH} + "/png/rgba/" + filename;
+    return std::string{TEST_DATA_PATH} + "/png/rgb/" + filename;
 }
 
 inline std::string pngName(const std::string& fontname, size_t size)

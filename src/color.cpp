@@ -22,7 +22,6 @@ float clampChannel(float f)
 
 Color blendColors(Color bg, Color fg)
 {
-    // TODO fix bg alpha
     // treat nums as 8.8 fixed-point
     const uint32_t alpha = fg.a();
     const uint32_t invAlpha = (255 - alpha);
@@ -30,7 +29,7 @@ Color blendColors(Color bg, Color fg)
         static_cast<uint8_t>((alpha * fg.r() + invAlpha * bg.r()) / SCALE_FACTOR),
         static_cast<uint8_t>((alpha * fg.g() + invAlpha * bg.g()) / SCALE_FACTOR),
         static_cast<uint8_t>((alpha * fg.b() + invAlpha * bg.b()) / SCALE_FACTOR),
-        static_cast<uint8_t>((alpha * fg.a() + invAlpha * bg.a()) / SCALE_FACTOR)
+        0xff
     };
 }
 

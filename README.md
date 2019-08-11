@@ -42,4 +42,7 @@ brew install freetype
 Lib also uses gtest and cxxopts, but they're git submodules, so you shouldn't worry.
 
 # TODO list
-
+- png read/write with different bitdepth and color modes
+- fixed size fonts
+- support for alpha channel in text and background color
+- non-ASCII encodings

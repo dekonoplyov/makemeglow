@@ -18,20 +18,14 @@ std::string joinText(const std::vector<std::string>& strings)
 
 glow::Color parseColor(const std::string& s)
 {
-    if (s.size() < 7 || s[0] != '#') {
-        throw std::runtime_error{"Color format is #RRGGBB{AA}"};
+    if (s.size() != 7 || s[0] != '#') {
+        throw std::runtime_error{"Color format is #RRGGBB"};
     }
 
     uint32_t value = 0;
     const auto substr = s.substr(1);
-    if (substr.size() == 6) {
-        value = strtoul(substr.c_str(), nullptr, /* base*/ 16);
-        value = (value << 8) | 0xff;
-    } else if (substr.size() == 8) {
-        value = strtoul(substr.c_str(), nullptr, /* base*/ 16);
-    } else {
-        throw std::runtime_error{"Color format is #RRGGBB{AA}"};
-    }
+    value = strtoul(substr.c_str(), nullptr, /* base*/ 16);
+    value = (value << 8) | 0xff;
 
     return glow::Color{value};
 }
@@ -60,9 +54,9 @@ cxxopts::Options createProgramOptions()
         ("o,output", "Outout file",
             cxxopts::value<std::string>()->default_value("./text.png"))
         ("f,font", "Font file", cxxopts::value<std::string>())
-        ("c,color", "Text color color in format #RRGGBB{AA}",
+        ("c,color", "Text color color in format #RRGGBB",
             cxxopts::value<std::string>()->default_value("#faafff"))
-        ("b,background", "Background color in format #RRGGBB{AA}",
+        ("b,background", "Background color in format #RRGGBB",
             cxxopts::value<std::string>()->default_value("#100f00"))
         ("s,size", "Text size in pixels",
             cxxopts::value<size_t>()->default_value("20"))

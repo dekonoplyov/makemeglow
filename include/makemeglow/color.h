@@ -61,7 +61,6 @@ private:
 float clampChannel(float f);
 
 /*
- * Color blending with precomputed alpha
  * https://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
  */
 Color blendColors(Color bg, Color fg);

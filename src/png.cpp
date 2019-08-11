@@ -9,6 +9,10 @@ namespace glow {
 
 namespace {
 
+constexpr int BIT_DEPTH = 8;
+constexpr int GRAY_STRIDE = 1;
+constexpr int RGB_STRIDE = 3;
+
 enum class PngIOMode {
     Read,
     Write
@@ -125,7 +129,7 @@ void write(const std::string& filename,
     png_init_io(writer.png, writer.file);
     png_set_IHDR(writer.png, writer.info,
         width, height,
-        /*bit depth*/ 8,
+        BIT_DEPTH,
         colorMode, PNG_INTERLACE_NONE,
         PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
     png_write_info(writer.png, writer.info);
@@ -145,7 +149,7 @@ Buffer<T> read(const std::string& filename,
     png_init_io(reader.png, reader.file);
     png_read_info(reader.png, reader.info);
 
-    if (png_get_bit_depth(reader.png, reader.info) != 8) {
+    if (png_get_bit_depth(reader.png, reader.info) != BIT_DEPTH) {
         throw std::runtime_error{"Unsupported bit depth"};
     }
 
@@ -173,16 +177,15 @@ void writePng(const std::string& filename, const ColorBuffer& buffer)
 {
     write(filename,
         buffer.width(), buffer.height(),
-        PNG_COLOR_TYPE_RGBA, /*stride*/ 4,
+        PNG_COLOR_TYPE_RGB, RGB_STRIDE,
         [&buffer](png_structp png, png_bytep row) {
             for (size_t y = 0; y < buffer.height(); y++) {
                 for (size_t x = 0; x < buffer.width(); x++) {
-                    png_byte* currentPixel = &row[x * 4];
+                    png_byte* currentPixel = &row[x * RGB_STRIDE];
                     const auto color = buffer.at(x, y);
                     currentPixel[0] = color.r();
                     currentPixel[1] = color.g();
                     currentPixel[2] = color.b();
-                    currentPixel[3] = color.a();
                 }
                 png_write_row(png, row);
             }
@@ -193,7 +196,7 @@ void writePng(const std::string& filename, const IntensityBuffer& buffer)
 {
     write(filename,
         buffer.width(), buffer.height(),
-        PNG_COLOR_TYPE_GRAY, /*stride*/ 1,
+        PNG_COLOR_TYPE_GRAY, GRAY_STRIDE,
         [&buffer](png_structp png, png_bytep row) {
             for (size_t y = 0; y < buffer.height(); y++) {
                 for (size_t x = 0; x < buffer.width(); x++) {
@@ -207,21 +210,19 @@ void writePng(const std::string& filename, const IntensityBuffer& buffer)
 IntensityBuffer readGrayPng(const std::string& filename)
 {
     return read<uint8_t>(filename,
-        PNG_COLOR_TYPE_GRAY, /*stride*/ 1,
+        PNG_COLOR_TYPE_GRAY, GRAY_STRIDE,
         [](png_bytep pixel) { return *pixel; });
 }
 
-ColorBuffer readRGBAPng(const std::string& filename)
+ColorBuffer readRGBPng(const std::string& filename)
 {
-
     return read<Color>(filename,
-        PNG_COLOR_TYPE_RGBA, /*stride*/ 4,
+        PNG_COLOR_TYPE_RGB, RGB_STRIDE,
         [](png_bytep pixel) {
             return Color{
                 pixel[0],
                 pixel[1],
-                pixel[2],
-                pixel[3]};
+                pixel[2]};
         });
 }
 

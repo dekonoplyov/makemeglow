@@ -59,7 +59,7 @@ TEST(ColorTest, Blend)
         ASSERT_EQ(blended.r(), 118);
         ASSERT_EQ(blended.g(), 63);
         ASSERT_EQ(blended.b(), 82);
-        ASSERT_EQ(blended.a(), 188);
+        ASSERT_EQ(blended.a(), 255);
     }
 
     {
@@ -70,6 +70,6 @@ TEST(ColorTest, Blend)
         ASSERT_EQ(blended.r(), 0);
         ASSERT_EQ(blended.g(), 12);
         ASSERT_EQ(blended.b(), 149);
-        ASSERT_EQ(blended.a(), 254);
+        ASSERT_EQ(blended.a(), 255);
     }
 }

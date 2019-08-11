@@ -13,7 +13,7 @@ TEST(PngTest, ReadFail)
 {
     using namespace glow;
     ASSERT_THROW(readGrayPng(glow::grayPngPath("some.png")), std::runtime_error);
-    ASSERT_THROW(readGrayPng(glow::rgbaPngPath("Farro-Light.ttf10.png")), std::runtime_error);
+    ASSERT_THROW(readGrayPng(glow::rgbPngPath("Farro-Light.ttf10.png")), std::runtime_error);
 }
 
 TEST(PngTest, WriteFail)
