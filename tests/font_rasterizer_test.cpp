@@ -1,6 +1,6 @@
 #include "test_data.h"
 
-#include "font_rasterizer.h"
+#include "makemeglow/font_rasterizer.h"
 #include "makemeglow/png.h"
 
 #include <gtest/gtest.h>

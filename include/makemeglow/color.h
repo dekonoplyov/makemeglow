@@ -67,7 +67,7 @@ float clampChannel(float f);
 Color blendColors(Color bg, Color fg);
 
 /*
- * Parse colors in #RRGGBB format
+ * Parse colors in RRGGBB format
  */
 Color parseColor(const std::string& s);
 

@@ -1,4 +1,4 @@
-#include "gauss.h"
+#include "gauss_kernel.h"
 
 #include "makemeglow/buffer.h"
 
