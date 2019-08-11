@@ -33,10 +33,10 @@ glow::Color parseColor(const std::string& s)
 void validateArgs(const cxxopts::ParseResult& args)
 {
     if (args.count("input") == 0) {
-        throw std::runtime_error{"Input is required param"};
+        throw cxxopts::OptionException{"Input is required param"};
     }
     if (args.count("font") == 0) {
-        throw std::runtime_error{"Font is required param"};
+        throw cxxopts::OptionException{"Font is required param"};
     }
 }
 
@@ -60,8 +60,8 @@ cxxopts::Options createProgramOptions()
             cxxopts::value<std::string>()->default_value("#100f00"))
         ("s,size", "Text size in pixels",
             cxxopts::value<size_t>()->default_value("20"))
-        ("kernel", "Kernel size of Gaussian blur in pixels",
-            cxxopts::value<size_t>()->default_value("7"))
+        ("kernel", "Kernel size of Gaussian blur",
+            cxxopts::value<size_t>()->default_value("9"))
         ("sigma", "Sigma parameter of Gaussian blur",
             cxxopts::value<float>()->default_value("1.f"));
     // clang-format on
@@ -110,20 +110,27 @@ int main(int argc, char* argv[])
 {
     try {
         auto options = createProgramOptions();
-        auto args = options.parse(argc, argv);
+        const auto args = options.parse(argc, argv);
+        
         if (args.count("help")) {
             std::cout << options.help({"", "Group"}) << std::endl;
             exit(0);
         }
 
         validateArgs(args);
-        auto params = getRasterParams(args);
+        const auto params = getRasterParams(args);
 
         glow::writePng(args["output"].as<std::string>(), rasterize(params));
 
         return 0;
     } catch (const cxxopts::OptionException& e) {
         std::cout << "error parsing options: " << e.what() << std::endl;
+        exit(1);
+    } catch (const std::runtime_error& e) {
+        std::cout << "error rendering text " << e.what() << std::endl;
+        exit(1);
+    } catch (...) {
+        std::cout << "oops...\n";
         exit(1);
     }
 }
