@@ -46,14 +46,14 @@ public:
         return height_;
     }
 
-    T at(size_t x, size_t y) const
+    T operator()(size_t x, size_t y) const
     {
-        return buffer_.at(x + y * width_);
+        return buffer_[x + y * width_];
     }
 
-    T& at(size_t x, size_t y)
+    T& operator()(size_t x, size_t y)
     {
-        return buffer_.at(x + y * width_);
+        return buffer_[x + y * width_];
     }
 
 private:

@@ -32,8 +32,8 @@ std::vector<float> gauss1dKernel(size_t kernelSize, float sigma2)
 
     for (size_t j = 0; j < kernelSize; ++j) {
         for (size_t i = 0; i < kernelSize; ++i) {
-            weights.at(i, j) = std::exp(-distance(i, j, offset) / (2.f * sigma2));
-            sum += weights.at(i, j);
+            weights(i, j) = std::exp(-distance(i, j, offset) / (2.f * sigma2));
+            sum += weights(i, j);
         }
     }
 
@@ -41,14 +41,14 @@ std::vector<float> gauss1dKernel(size_t kernelSize, float sigma2)
 
     for (size_t j = 0; j < weights.width(); ++j) {
         for (size_t i = 0; i < weights.height(); ++i) {
-            weights.at(i, j) /= sum;
+            weights(i, j) /= sum;
         }
     }
 
     // take right half of central row
     std::vector<float> kernel;
     for (size_t i = 0; i <= offset; ++i) {
-        kernel.push_back(weights.at(i + offset, offset));
+        kernel.push_back(weights(i + offset, offset));
     }
 
     return kernel;

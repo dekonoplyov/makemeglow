@@ -30,35 +30,35 @@ ColorBuffer gaussianBlur(
     IntensityBuffer horizontalPass{buffer.width(), buffer.height()};
     for (int y = 0; y < yLimit; ++y) {
         for (int x = 0; x < xLimit; ++x) {
-            float res = static_cast<float>(buffer.at(x, y)) * weights[0];
+            float res = static_cast<float>(buffer(x, y)) * weights[0];
             for (int i = 1; i < radius; ++i) {
                 if (x + i < xLimit) {
-                    res += static_cast<float>(buffer.at(x + i, y)) * weights[i];
+                    res += static_cast<float>(buffer(x + i, y)) * weights[i];
                 }
                 if (x - i >= 0) {
-                    res += static_cast<float>(buffer.at(x - i, y)) * weights[i];
+                    res += static_cast<float>(buffer(x - i, y)) * weights[i];
                 }
             }
-            horizontalPass.at(x, y) = static_cast<uint8_t>(clampChannel(res));
+            horizontalPass(x, y) = static_cast<uint8_t>(clampChannel(res));
         }
     }
 
     ColorBuffer verticalPass{buffer.width(), buffer.height()};
     for (int y = 0; y < yLimit; ++y) {
         for (int x = 0; x < xLimit; ++x) {
-            float res = static_cast<float>(horizontalPass.at(x, y)) * weights[0];
+            float res = static_cast<float>(horizontalPass(x, y)) * weights[0];
             for (int i = 1; i < radius; ++i) {
                 if (y + i < yLimit) {
-                    res += static_cast<float>(horizontalPass.at(x, y + i)) * weights[i];
+                    res += static_cast<float>(horizontalPass(x, y + i)) * weights[i];
                 }
                 if (y - i >= 0) {
-                    res += static_cast<float>(horizontalPass.at(x, y - i)) * weights[i];
+                    res += static_cast<float>(horizontalPass(x, y - i)) * weights[i];
                 }
             }
 
-            const auto intensity = std::max(static_cast<uint8_t>(clampChannel(res)), buffer.at(x, y)) / 255.f;
+            const auto intensity = std::max(static_cast<uint8_t>(clampChannel(res)), buffer(x, y)) / 255.f;
             Color c{textColor.r(), textColor.g(), textColor.b(), static_cast<uint8_t>(textColor.a() * intensity)};
-            verticalPass.at(x, y) = blendColors(backgroundColor, c);
+            verticalPass(x, y) = blendColors(backgroundColor, c);
         }
     }
 

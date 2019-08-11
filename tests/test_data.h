@@ -44,7 +44,7 @@ bool isEquals(const Buffer<T>& l, const Buffer<T>& r)
     size_t mismatches = 0;
     for (size_t y = 0; y < l.height(); ++y) {
         for (size_t x = 0; x < l.width(); ++x) {
-            if (l.at(x, y) != r.at(x, y)) {
+            if (l(x, y) != r(x, y)) {
                 mismatches++;
             }
         }

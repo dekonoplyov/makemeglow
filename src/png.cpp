@@ -164,7 +164,7 @@ Buffer<T> read(const std::string& filename,
     for (size_t y = 0; y < height; y++) {
         png_read_row(reader.png, reader.row, nullptr);
         for (size_t x = 0; x < width; ++x) {
-            buffer.at(x, y) = readPixel(&reader.row[x * stride]);
+            buffer(x, y) = readPixel(&reader.row[x * stride]);
         }
     }
 
@@ -182,7 +182,7 @@ void writePng(const std::string& filename, const ColorBuffer& buffer)
             for (size_t y = 0; y < buffer.height(); y++) {
                 for (size_t x = 0; x < buffer.width(); x++) {
                     png_byte* currentPixel = &row[x * RGB_STRIDE];
-                    const auto color = buffer.at(x, y);
+                    const auto color = buffer(x, y);
                     currentPixel[0] = color.r();
                     currentPixel[1] = color.g();
                     currentPixel[2] = color.b();
@@ -200,7 +200,7 @@ void writePng(const std::string& filename, const IntensityBuffer& buffer)
         [&buffer](png_structp png, png_bytep row) {
             for (size_t y = 0; y < buffer.height(); y++) {
                 for (size_t x = 0; x < buffer.width(); x++) {
-                    row[x] = buffer.at(x, y);
+                    row[x] = buffer(x, y);
                 }
                 png_write_row(png, row);
             }
