@@ -1,3 +1,4 @@
+#include "makemeglow/color.h"
 #include "makemeglow/glow.h"
 #include "makemeglow/png.h"
 
@@ -14,20 +15,6 @@ std::string joinText(const std::vector<std::string>& strings)
         [](const std::string& l, const std::string& r) {
             return l + (l.empty() ? "" : " ") + r;
         });
-}
-
-glow::Color parseColor(const std::string& s)
-{
-    if (s.size() != 7 || s[0] != '#') {
-        throw std::runtime_error{"Color format is #RRGGBB"};
-    }
-
-    uint32_t value = 0;
-    const auto substr = s.substr(1);
-    value = strtoul(substr.c_str(), nullptr, /* base*/ 16);
-    value = (value << 8) | 0xff;
-
-    return glow::Color{value};
 }
 
 void validateArgs(const cxxopts::ParseResult& args)
@@ -88,8 +75,8 @@ RasterParams getRasterParams(const cxxopts::ParseResult& args)
     params.text = joinText(args["input"].as<std::vector<std::string>>());
     params.font = args["font"].as<std::string>();
     params.pixelSize = args["size"].as<size_t>();
-    params.textColor = parseColor(args["color"].as<std::string>());
-    params.backgroundColor = parseColor(args["background"].as<std::string>());
+    params.textColor = glow::parseColor(args["color"].as<std::string>());
+    params.backgroundColor = glow::parseColor(args["background"].as<std::string>());
     params.kernelSize = args["kernel"].as<size_t>();
     params.sigma = args["sigma"].as<float>();
 
@@ -98,10 +85,10 @@ RasterParams getRasterParams(const cxxopts::ParseResult& args)
 
 glow::ColorBuffer rasterize(const RasterParams& params)
 {
-    return glow::rasterize(params.text, params.font,
-        params.pixelSize,
-        params.textColor, params.backgroundColor,
-        glow::GlowParams{params.kernelSize, params.sigma});
+    return glow::makeRasterizer(params.font)
+        ->rasterize(params.text, params.pixelSize,
+            params.textColor, params.backgroundColor,
+            glow::GlowParams{params.kernelSize, params.sigma});
 }
 
 } // namespace

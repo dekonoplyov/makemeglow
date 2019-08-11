@@ -33,4 +33,16 @@ Color blendColors(Color bg, Color fg)
     };
 }
 
+glow::Color parseColor(const std::string& s)
+{
+    if (s.size() != 7 || s[0] != '#') {
+        throw std::runtime_error{"Color format is #RRGGBB"};
+    }
+
+    uint32_t value = strtoul(s.substr(1).c_str(), nullptr, /* base*/ 16);
+    value = (value << 8) | 0xff;
+
+    return glow::Color{value};
+}
+
 } // namespace glow

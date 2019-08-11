@@ -1,7 +1,7 @@
-#include "gauss.h"
-
-#include "makemeglow/font_rasterizer.h"
 #include "makemeglow/glow.h"
+
+#include "font_rasterizer.h"
+#include "gauss.h"
 
 #include <algorithm>
 #include <array>
@@ -67,24 +67,10 @@ ColorBuffer gaussianBlur(
 
 } // namespace
 
-ColorBuffer rasterize(
-    const std::string& text,
-    const std::string& font,
-    size_t pixelSize,
-    Color textColor,
-    Color BackgroundColor,
-    GlowParams glowParams)
-{
-    const auto weights = gauss1dKernel(glowParams.kernelSize, glowParams.sigma);
-    FontRasterizer rasterizer{font};
-    const auto intensityBuffer = rasterizer.rasterize(text, pixelSize, glowParams.kernelSize / 2);
-    return gaussianBlur(intensityBuffer, weights, textColor, BackgroundColor);
-}
-
-class Rasterizer::RasterizerImpl {
+class Rasterizer : public RasterizerInterface {
 public:
-    RasterizerImpl(const std::string& font)
-        : rasterizer_{font}
+    Rasterizer(const std::string& font)
+        : fontRasterizer_{makeFontRasterizer(font)}
     {
     }
 
@@ -92,9 +78,9 @@ public:
         const std::string& text,
         size_t pixelSize,
         Color textColor,
-        Color backgroundColor)
+        Color backgroundColor) override
     {
-        const auto intensityBuffer = rasterizer_.rasterize(text, pixelSize, /* margin */ 0);
+        const auto intensityBuffer = fontRasterizer_->rasterize(text, pixelSize, /* margin */ 0);
         return gaussianBlur(intensityBuffer, /* weights */ {1.f}, textColor, backgroundColor);
     }
 
@@ -103,9 +89,9 @@ public:
         size_t pixelSize,
         Color textColor,
         Color backgroundColor,
-        GlowParams glowParams)
+        GlowParams glowParams) override
     {
-        const auto intensityBuffer = rasterizer_.rasterize(text, pixelSize,
+        const auto intensityBuffer = fontRasterizer_->rasterize(text, pixelSize,
             /* margin */ glowParams.kernelSize / 2);
         return gaussianBlur(intensityBuffer,
             gauss1dKernel(glowParams.kernelSize, glowParams.sigma),
@@ -117,9 +103,9 @@ public:
         size_t pixelSize,
         Color textColor,
         Color backgroundColor,
-        const std::vector<float>& weights)
+        const std::vector<float>& weights) override
     {
-        const auto intensityBuffer = rasterizer_.rasterize(text, pixelSize,
+        const auto intensityBuffer = fontRasterizer_->rasterize(text, pixelSize,
             /* margin */ weights.size() - 1);
         return gaussianBlur(intensityBuffer,
             weights,
@@ -127,43 +113,12 @@ public:
     }
 
 private:
-    FontRasterizer rasterizer_;
+    FontRasterizerPtr fontRasterizer_;
 };
 
-Rasterizer::Rasterizer(const std::string& font)
-    : impl_{std::make_unique<RasterizerImpl>(font)}
+RasterizerPtr makeRasterizer(const std::string& font)
 {
-}
-
-Rasterizer::~Rasterizer() = default;
-
-ColorBuffer Rasterizer::rasterize(
-    const std::string& text,
-    size_t pixelSize,
-    Color textColor,
-    Color backgroundColor)
-{
-    return impl_->rasterize(text, pixelSize, textColor, backgroundColor);
-}
-
-ColorBuffer Rasterizer::rasterize(
-    const std::string& text,
-    size_t pixelSize,
-    Color textColor,
-    Color backgroundColor,
-    GlowParams glowParams)
-{
-    return impl_->rasterize(text, pixelSize, textColor, backgroundColor, glowParams);
-}
-
-ColorBuffer Rasterizer::rasterize(
-    const std::string& text,
-    size_t pixelSize,
-    Color textColor,
-    Color backgroundColor,
-    const std::vector<float>& weights)
-{
-    return impl_->rasterize(text, pixelSize, textColor, backgroundColor, weights);
+    return std::make_unique<Rasterizer>(font);
 }
 
 } // namespace glow

@@ -11,42 +11,33 @@ struct GlowParams {
     float sigma;
 };
 
-ColorBuffer rasterize(
-    const std::string& text,
-    const std::string& font,
-    size_t pixelSize,
-    Color textColor,
-    Color BackgroundColor,
-    GlowParams glowParams = GlowParams{9, 7.f});
-
-class Rasterizer {
+class RasterizerInterface {
 public:
-    Rasterizer(const std::string& font);
-    ~Rasterizer();
+    virtual ~RasterizerInterface() {};
 
-    ColorBuffer rasterize(
+    virtual ColorBuffer rasterize(
         const std::string& text,
         size_t pixelSize,
         Color textColor,
-        Color BackgroundColor);
+        Color BackgroundColor) = 0;
 
-    ColorBuffer rasterize(
-        const std::string& text,
-        size_t pixelSize,
-        Color textColor,
-        Color BackgroundColor,
-        GlowParams glowParams);
-
-    ColorBuffer rasterize(
+    virtual ColorBuffer rasterize(
         const std::string& text,
         size_t pixelSize,
         Color textColor,
         Color BackgroundColor,
-        const std::vector<float>& weights);
+        GlowParams glowParams) = 0;
 
-private:
-    class RasterizerImpl;
-    std::unique_ptr<RasterizerImpl> impl_;
+    virtual ColorBuffer rasterize(
+        const std::string& text,
+        size_t pixelSize,
+        Color textColor,
+        Color BackgroundColor,
+        const std::vector<float>& weights) = 0;
 };
+
+using RasterizerPtr = std::unique_ptr<RasterizerInterface>;
+
+RasterizerPtr makeRasterizer(const std::string& font);
 
 } // namespace glow

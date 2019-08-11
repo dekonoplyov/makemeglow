@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace glow {
 
@@ -64,5 +65,10 @@ float clampChannel(float f);
  * https://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
  */
 Color blendColors(Color bg, Color fg);
+
+/*
+ * Parse colors in #RRGGBB format
+ */
+Color parseColor(const std::string& s);
 
 } // namespace glow

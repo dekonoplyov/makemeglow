@@ -1,4 +1,4 @@
-#include "makemeglow/font_rasterizer.h"
+#include "font_rasterizer.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -130,9 +130,9 @@ void drawBitamp(IntensityBuffer& buffer, size_t left, size_t top, FT_Bitmap* bit
 
 } // namespace
 
-class FontRasterizer::FontRasterizerImpl {
+class FontRasterizer : public FontRasterizerInterface {
 public:
-    FontRasterizerImpl(const std::string& font)
+    FontRasterizer(const std::string& font)
         : library_{nullptr}
         , guard_{&library_}
         , face_{nullptr}
@@ -142,7 +142,7 @@ public:
         checkScalability(face_);
     }
 
-    IntensityBuffer rasterize(const std::string& text, size_t pixelSize, size_t margin)
+    IntensityBuffer rasterize(const std::string& text, size_t pixelSize, size_t margin = 0) override
     {
         if (FT_Set_Pixel_Sizes(face_, 0, pixelSize) != 0) {
             throw std::runtime_error{"Failed to set pixel size"};
@@ -190,17 +190,9 @@ private:
     FT_Face face_;
 };
 
-FontRasterizer::FontRasterizer(const std::string& font)
-    : impl_{std::make_unique<FontRasterizerImpl>(font)}
+FontRasterizerPtr makeFontRasterizer(const std::string& font)
 {
-}
-
-// for pimpl
-FontRasterizer::~FontRasterizer() = default;
-
-IntensityBuffer FontRasterizer::rasterize(const std::string& text, size_t pixelSize, size_t margin)
-{
-    return impl_->rasterize(text, pixelSize, margin);
+    return std::make_unique<FontRasterizer>(font);
 }
 
 } // namespace glow
