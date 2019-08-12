@@ -17,7 +17,7 @@ make tests
 ```
 
 ## Render text
-You can use glow app.
+You can use glow app and listen [Lenny's masterpiece](https://www.youtube.com/watch?v=ucvLuGgsGS8).
 ```
 ./glow_app -f ../../tests/data/font/JosefinSans-Regular.ttf -s 40 I belong to you
 ```
@@ -64,6 +64,8 @@ brew install freetype
 ```
 
 Lib also uses gtest and cxxopts, but they're git submodules, so you shouldn't worry.
+
+# Notes
 
 # TODO list
 - png read/write with different bitdepth and color modes
