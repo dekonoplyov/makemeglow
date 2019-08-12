@@ -40,17 +40,7 @@ bool isEquals(const Buffer<T>& l, const Buffer<T>& r)
         return false;
     }
 
-    // TODO consider other ways to compare png with threshold
-    size_t mismatches = 0;
-    for (size_t y = 0; y < l.height(); ++y) {
-        for (size_t x = 0; x < l.width(); ++x) {
-            if (l(x, y) != r(x, y)) {
-                mismatches++;
-            }
-        }
-    }
-
-    return mismatches * 20 < l.data().size();
+    return std::equal(l.data().cbegin(), l.data().cend(), r.data().cbegin());
 }
 
 } // namespace glow

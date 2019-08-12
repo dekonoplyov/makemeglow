@@ -70,6 +70,7 @@ brew install freetype
 Lib also uses gtest and cxxopts, but they're git submodules, so you shouldn't worry.
 
 # Notes
+You can look at detailed dev notes [here](docs/notes.md)
 
 # TODO list
 - png read/write with different bitdepth and color modes
