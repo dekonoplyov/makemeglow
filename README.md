@@ -19,7 +19,31 @@ make tests
 ## Render text
 You can use glow app.
 ```
-./glow_app -f /path/to/font/file.ttf "positional args are parts of text to render"
+./glow_app -f ../../tests/data/font/JosefinSans-Regular.ttf -s 40 I belong to you
+```
+![glow_app1](data/glow_app1.png "glow_app1")
+
+Chose different font, size and specify colors
+```
+./glow_app -f ../../tests/data/font/IndieFlower-Regular.ttf -s 30 -c f0ff00 -b 100050 -- And you you belong to me too
+```
+![glow_app2](data/glow_app2.png "glow_app2")
+
+Set Gauss kernel params
+```
+./glow_app -f ../../tests/data/font/NotoSansJP-Black.otf -s 30 -c 0fff9f --kernel 15 --sigma 15.f -- You make my life complete
+```
+![glow_app3](data/glow_app3.png "glow_app3")
+
+Specify output
+```
+./glow_app -f ../../tests/data/font/NotoSansJP-Black.otf -o ./some/path/to/text.png -s 30 -b 55124f  -- You make me feel so sweet
+```
+![glow_app4](data/glow_app4.png "glow_app4")
+
+For full help use
+```
+./glow_app -h
 ```
 
 # Requirements
@@ -46,3 +70,4 @@ Lib also uses gtest and cxxopts, but they're git submodules, so you shouldn't wo
 - fixed size fonts
 - support for alpha channel in text and background color
 - non-ASCII encodings
+- multiple Gauss kernel pass
