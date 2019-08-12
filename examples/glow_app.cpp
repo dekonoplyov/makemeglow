@@ -50,7 +50,7 @@ cxxopts::Options createProgramOptions()
         ("kernel", "Kernel size of Gaussian blur",
             cxxopts::value<size_t>()->default_value("9"))
         ("sigma", "Sigma parameter of Gaussian blur",
-            cxxopts::value<float>()->default_value("3.0f"));
+            cxxopts::value<float>()->default_value("3.0"));
     // clang-format on
 
     options.parse_positional({"input"});
