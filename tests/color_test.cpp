@@ -73,3 +73,21 @@ TEST(ColorTest, Blend)
         ASSERT_EQ(blended.a(), 255);
     }
 }
+
+TEST(ColorTest, ParseFail)
+{
+    ASSERT_THROW(glow::parseColor(""), std::runtime_error);
+    ASSERT_THROW(glow::parseColor("#000"), std::runtime_error);
+    ASSERT_THROW(glow::parseColor("#zcb000"), std::runtime_error);
+    // strtoul has no way to handle base 16 format
+    ASSERT_NO_THROW(glow::parseColor("zcb000"));
+}
+
+TEST(ColorTest, Parse)
+{
+    const auto color = glow::parseColor("aabbcc");
+    ASSERT_EQ(color.r(), 170);
+    ASSERT_EQ(color.g(), 187);
+    ASSERT_EQ(color.b(), 204);
+    ASSERT_EQ(color.a(), 255);
+}

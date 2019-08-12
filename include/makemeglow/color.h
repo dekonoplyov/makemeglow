@@ -52,6 +52,16 @@ public:
         return a_;
     }
 
+    bool operator==(Color c)
+    {
+        return r_ == c.r_ && g_ == c.g_ && b_ == c.b_ && a_ == c.a_;
+    }
+
+    bool operator!=(Color c)
+    {
+        return !(operator==(c));
+    }
+
 private:
     uint8_t r_;
     uint8_t g_;

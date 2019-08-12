@@ -26,5 +26,6 @@ package_add_test(glowtest
     color_test.cpp
     font_rasterizer_test.cpp
     gauss_test.cpp
+    glow_buffer_test.cpp
     png_test.cpp
     run_tests.cpp)

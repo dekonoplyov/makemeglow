@@ -36,7 +36,7 @@ cxxopts::Options createProgramOptions()
     options
         .allow_unrecognised_options()
         .add_options()
-        ("help", "Print help")
+        ("h,help", "Print help")
         ("input", "Input", cxxopts::value<std::vector<std::string>>())
         ("o,output", "Outout file",
             cxxopts::value<std::string>()->default_value("./text.png"))
@@ -50,7 +50,7 @@ cxxopts::Options createProgramOptions()
         ("kernel", "Kernel size of Gaussian blur",
             cxxopts::value<size_t>()->default_value("9"))
         ("sigma", "Sigma parameter of Gaussian blur",
-            cxxopts::value<float>()->default_value("1.f"));
+            cxxopts::value<float>()->default_value("3.f"));
     // clang-format on
 
     options.parse_positional({"input"});
