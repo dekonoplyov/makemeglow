@@ -31,13 +31,13 @@ Chose different font, size and specify colors
 
 Set Gauss kernel params
 ```
-./glow_app -f ../../tests/data/font/NotoSansJP-Black.otf -s 30 -c 0fff9f --kernel 15 --sigma 15.f -- You make my life complete
+./glow_app -f ../../tests/data/font/NotoSansJP-Black.otf -s 30 -c 0fff9f --kernel 15 --sigma 15.0 -- You make my life complete
 ```
 ![glow_app3](data/glow_app3.png "glow_app3")
 
 Specify output
 ```
-./glow_app -f ../../tests/data/font/NotoSansJP-Black.otf -o ./some/path/to/text.png -s 30 -b 55124f  -- You make me feel so sweet
+./glow_app -f ../../tests/data/font/NotoSansJP-Black.otf -o ./path_to_text.png -s 30 -b 55124f  -- You make me feel so sweet
 ```
 ![glow_app4](data/glow_app4.png "glow_app4")
 
@@ -46,6 +46,9 @@ For full help use
 ./glow_app -h
 ```
 
+Note, that I use cxxopts to parse command line input, and it can skip some chars, like comas, quote marks, etc.
+If you have some problems, just paste your string [here](https://github.com/dekonoplyov/makemeglow/blob/master/examples/hello.cpp#L8)
+
 # Requirements
 Compiler with C++14 support.
 
@@ -53,9 +56,10 @@ Compiler with C++14 support.
 
 Install on Linux
 ```
+sudo apt-get install libfreetype6-dev
 sudo apt-get install libpng-dev
 ```
-To install freetype use one of these links [1](http://ubuntuhandbook.org/index.php/2017/06/install-freetype-2-8-in-ubuntu-16-04-17-04/)[2](http://ubuntuhandbook.org/index.php/2016/09/install-freetype-2-7-ubuntu-16-04/)
+To get freetype ppa use one of these links [1](http://ubuntuhandbook.org/index.php/2017/06/install-freetype-2-8-in-ubuntu-16-04-17-04/)[2](http://ubuntuhandbook.org/index.php/2016/09/install-freetype-2-7-ubuntu-16-04/)
 
 Install on Mac
 ```

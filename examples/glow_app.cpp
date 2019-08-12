@@ -41,9 +41,9 @@ cxxopts::Options createProgramOptions()
         ("o,output", "Outout file",
             cxxopts::value<std::string>()->default_value("./text.png"))
         ("f,font", "Font file", cxxopts::value<std::string>())
-        ("c,color", "Text color color in format #RRGGBB",
+        ("c,color", "Text color color in format RRGGBB",
             cxxopts::value<std::string>()->default_value("faafff"))
-        ("b,background", "Background color in format #RRGGBB",
+        ("b,background", "Background color in format RRGGBB",
             cxxopts::value<std::string>()->default_value("100f00"))
         ("s,size", "Text size in pixels",
             cxxopts::value<size_t>()->default_value("20"))
