@@ -7,7 +7,6 @@
     
     You can find code [here](https://github.com/dekonoplyov/makemeglow/blob/master/src/font_rasterizer.cpp#L78)
 
-
 - Glow effect
   
   I've implemented two pass Gaussian blur algorithm mentioned [this article](https://learnopengl.com/Advanced-Lighting/Bloom)
