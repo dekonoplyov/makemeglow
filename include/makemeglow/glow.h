@@ -13,14 +13,21 @@ struct GlowParams {
 
 class RasterizerInterface {
 public:
-    virtual ~RasterizerInterface() {};
+    virtual ~RasterizerInterface(){};
 
+    /*
+     * Rasterize text without glow effect
+     */
     virtual ColorBuffer rasterize(
         const std::string& text,
         size_t pixelSize,
         Color textColor,
         Color BackgroundColor) = 0;
 
+    /*
+     * Rasterize text with glow effect.
+     * Kernel will be computed from glowParams
+     */
     virtual ColorBuffer rasterize(
         const std::string& text,
         size_t pixelSize,
@@ -28,6 +35,9 @@ public:
         Color BackgroundColor,
         GlowParams glowParams) = 0;
 
+    /*
+     * Rasterize text with glow effect using custom weights
+     */
     virtual ColorBuffer rasterize(
         const std::string& text,
         size_t pixelSize,

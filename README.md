@@ -2,6 +2,13 @@
 Text rasterizer lib with glowing effect.
 
 # Quick start
+
+Don't forget to checkout submodules
+
+```
+git submodule update --init --recursive
+```
+
 ## Build
 
 ```
@@ -46,7 +53,7 @@ For full help use
 ./glow_app -h
 ```
 
-Note, that I use cxxopts to parse command line input, and it can skip some chars, like comas, quote marks, etc.
+Note, that I use cxxopts to parse command line input, it can skip some chars like comas, quote marks, etc.
 If you have some problems, just paste your string [here](https://github.com/dekonoplyov/makemeglow/blob/master/examples/hello.cpp#L8)
 
 # Requirements

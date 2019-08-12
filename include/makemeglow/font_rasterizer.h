@@ -6,9 +6,12 @@
 
 namespace glow {
 
+/*
+ * Use this class if you need to rasterize text without color
+ */
 class FontRasterizerInterface {
 public:
-    virtual ~FontRasterizerInterface() {};
+    virtual ~FontRasterizerInterface(){};
     virtual IntensityBuffer rasterize(const std::string& text, size_t pixelSize, size_t margin = 0) = 0;
 };
 
