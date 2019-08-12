@@ -29,3 +29,6 @@ package_add_test(glowtest
     glow_buffer_test.cpp
     png_test.cpp
     run_tests.cpp)
+
+package_add_test(flukytest
+    run_tests.cpp)

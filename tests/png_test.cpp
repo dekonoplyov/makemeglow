@@ -6,14 +6,16 @@
 
 TEST(PngTest, Read)
 {
-    ASSERT_NO_THROW(glow::readGrayPng(glow::grayPngPath("Farro-Light.ttf10.png")));
+    using namespace glow;
+    ASSERT_NO_THROW(readGrayPng(grayPngPath("Farro-Light.ttf10.png")));
+    ASSERT_NO_THROW(readRGBPng(rgbPngPath("some.png")));
 }
 
 TEST(PngTest, ReadFail)
 {
     using namespace glow;
-    ASSERT_THROW(readGrayPng(glow::grayPngPath("some.png")), std::runtime_error);
-    ASSERT_THROW(readGrayPng(glow::rgbPngPath("Farro-Light.ttf10.png")), std::runtime_error);
+    ASSERT_THROW(readRGBPng(grayPngPath("some.png")), std::runtime_error);
+    ASSERT_THROW(readGrayPng(rgbPngPath("Farro-Light.ttf10.png")), std::runtime_error);
 }
 
 TEST(PngTest, WriteFail)

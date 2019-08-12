@@ -78,3 +78,4 @@ You can look at detailed dev notes [here](docs/notes.md)
 - support for alpha channel in text and background color
 - non-ASCII encodings
 - multiple Gauss kernel pass
+- stable approach to test font rasterization
