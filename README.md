@@ -97,7 +97,7 @@ Lib also uses gtest and cxxopts, but they're git submodules, so you shouldn't wo
   Lib was tested on 
   - Ubuntu 18.04.3, gcc 7.4.0 & clang 6.0.0, cmake 3.10.2
   - Mac OS 10.14.5, Apple LLVM version 10.0.1, cmake version 3.15.2
-  - Ubuntu 16.04.6, gcc 5.4.0, cmake 3.5.1
+  - Ubuntu 16.04.6, gcc 5.4.0, cmake 3.5.1, some of rasterization tests could fail due to different sizes of png
 
 # TODO list
 - png read/write with different bitdepth and color modes
