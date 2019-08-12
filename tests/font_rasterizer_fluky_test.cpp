@@ -40,7 +40,7 @@ bool compare(const glow::IntensityBuffer& expected, const glow::IntensityBuffer&
 /*
  * This is not the best way to test rendering
  * different buffer sizes, intensities could crash comparison
- * This is why they only warn and not crashing
+ * This is why they warn and continue running
  */
 TEST(FontRasterizerTest, RasterASCII)
 {

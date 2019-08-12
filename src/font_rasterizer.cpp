@@ -85,7 +85,7 @@ FontRasterizerInfo preprocessText(FT_Face face, const std::string& text)
     FT_Pos width = 0;
     FT_Int maxBearingY = 0;
     FT_Int maxTailY = 0;
-    FT_Int lastCharTailX = 0;
+    FT_Pos lastCharTailX = 0;
 
     const FT_Bool useKerning = FT_HAS_KERNING(face);
     FT_UInt previousGlyphIndex = 0;
@@ -100,7 +100,7 @@ FontRasterizerInfo preprocessText(FT_Face face, const std::string& text)
         }
         const auto advance = slot->advance.x >> 6;
         width += advance;
-        lastCharTailX = static_cast<FT_Int>(slot->bitmap.width) - advance;
+        lastCharTailX = static_cast<FT_Pos>(slot->bitmap.width) - advance;
 
         maxBearingY = std::max(maxBearingY, slot->bitmap_top);
 
@@ -109,6 +109,10 @@ FontRasterizerInfo preprocessText(FT_Face face, const std::string& text)
 
         // update glyphIndex for kerning
         previousGlyphIndex = glyphIndex;
+    }
+
+    if (lastCharTailX < 0) {
+        lastCharTailX = 0;
     }
 
     return {
